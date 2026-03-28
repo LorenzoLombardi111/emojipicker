@@ -1,0 +1,17 @@
+{
+  "name": "Free Emoji Picker",
+  "short_name": "Emoji Picker",
+  "description": "Search, browse and copy emojis instantly.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#C49A2A",
+  "icons": [
+    {
+      "src": "/og-image.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
