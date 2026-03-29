@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Emoji Picker - freeemojipicker.app</title>
+<meta name="description" content="Free emoji picker. Search, browse, and copy emojis instantly.">
+<meta property="og:title" content="Free Emoji Picker">
+<meta property="og:description" content="Search, browse, and copy emojis instantly.">
+<meta property="og:image" content="/og-image.svg">
+<meta property="og:url" content="https://freeemojipicker.app">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#1a1a2e">
+<link rel="manifest" href="/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;--bg-secondary:#f5f5f7;--bg-tertiary:#e8e8ed;
+  --text:#1a1a2e;--text-secondary:#555;--text-muted:#888;
+  --border:#e0e0e0;--accent:#C49A2A;--accent-hover:#b08a22;
+  --header-bg:#ffffff;--search-bg:#f5f5f7;--search-border:#e0e0e0;
+  --tab-bg:#f0f0f3;--tab-active-bg:#C49A2A;--tab-active-text:#fff;
+  --grid-hover:#f0f0f3;--status-bg:#f5f5f7;--shadow:0 1px 3px rgba(0,0,0,0.08);
+  --toast-bg:#333;--toast-text:#fff;
+}
+[data-theme="dark"]{
+  --bg:#121218;--bg-secondary:#1a1a24;--bg-tertiary:#24243a;
+  --text:#e8e8f0;--text-secondary:#aaa;--text-muted:#777;
+  --border:#2a2a3e;--header-bg:#16161e;--search-bg:#1e1e2a;
+  --search-border:#2a2a3e;--tab-bg:#1e1e2a;--tab-active-bg:#C49A2A;
+  --tab-active-text:#fff;--grid-hover:#24243a;--status-bg:#16161e;
+  --shadow:0 1px 3px rgba(0,0,0,0.3);--toast-bg:#e8e8f0;--toast-text:#121218;
+}
+html{font-size:16px}
+body{
+  font-family:'DM Sans',system-ui,-apple-system,sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;display:flex;flex-direction:column;
+  transition:background .3s,color .3s;
+}
+/* Header */
+.header{
+  height:52px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;background:var(--header-bg);border-bottom:1px solid var(--border);
+  flex-shrink:0;position:sticky;top:0;z-index:100;
+}
+.header-logo{
+  font-family:'Lora',serif;font-size:1.15rem;font-weight:700;
+  color:var(--accent);text-decoration:none;letter-spacing:-0.01em;
+}
+.theme-toggle{
+  background:none;border:1px solid var(--border);border-radius:8px;
+  width:38px;height:38px;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;color:var(--text);font-size:1.15rem;
+  transition:background .2s,border-color .2s;
+}
+.theme-toggle:hover{background:var(--bg-secondary);border-color:var(--accent)}
+/* Search */
+.search-section{
+  padding:20px 20px 0;display:flex;justify-content:center;flex-shrink:0;
+}
+.search-wrap{
+  position:relative;width:100%;max-width:600px;
+}
+.search-icon{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  width:18px;height:18px;color:var(--text-muted);pointer-events:none;
+}
+.search-input{
+  width:100%;height:46px;padding:0 44px 0 42px;
+  background:var(--search-bg);border:1.5px solid var(--search-border);
+  border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.95rem;
+  color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;
+}
+.search-input::placeholder{color:var(--text-muted)}
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(196,154,42,0.15)}
+.search-clear{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--text-muted);cursor:pointer;
+  font-size:1.1rem;display:none;padding:4px;line-height:1;
+}
+.search-clear.visible{display:block}
+/* Category Tabs */
+.categories-section{
+  padding:14px 0 0;flex-shrink:0;
+}
+.categories-scroll{
+  display:flex;gap:6px;overflow-x:auto;padding:0 20px 14px;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.categories-scroll::-webkit-scrollbar{display:none}
+.cat-tab{
+  display:flex;align-items:center;gap:6px;padding:7px 14px;
+  border-radius:10px;border:1.5px solid var(--border);background:var(--tab-bg);
+  cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;
+  font-size:0.82rem;font-weight:500;color:var(--text-secondary);
+  transition:all .2s;flex-shrink:0;
+}
+.cat-tab:hover{border-color:var(--accent);color:var(--text)}
+.cat-tab.active{
+  background:var(--tab-active-bg);color:var(--tab-active-text);
+  border-color:var(--tab-active-bg);
+}
+.cat-tab .cat-emoji{font-size:1.05rem}
+/* Emoji Grid */
+.grid-section{
+  flex:1;padding:10px 20px 20px;display:flex;justify-content:center;
+  overflow-y:auto;
+}
+.grid-container{width:100%;max-width:600px}
+.grid-label{
+  font-size:0.8rem;font-weight:600;color:var(--text-muted);
+  text-transform:uppercase;letter-spacing:0.05em;padding:12px 0 8px;
+}
+.emoji-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(44px,1fr));
+  gap:2px;
+}
+.emoji-cell{
+  display:flex;align-items:center;justify-content:center;
+  width:100%;aspect-ratio:1;font-size:1.65rem;border-radius:10px;
+  cursor:pointer;transition:background .15s,transform .15s;
+  user-select:none;position:relative;
+}
+.emoji-cell:hover{background:var(--grid-hover);transform:scale(1.18)}
+.emoji-cell:active{transform:scale(0.95)}
+.no-results{
+  text-align:center;padding:60px 20px;color:var(--text-muted);
+  font-size:0.95rem;
+}
+.no-results .no-emoji{font-size:2.5rem;margin-bottom:12px}
+/* Toast */
+.toast{
+  position:fixed;bottom:60px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--toast-bg);color:var(--toast-text);
+  padding:10px 22px;border-radius:10px;font-size:0.85rem;font-weight:500;
+  opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;z-index:200;
+  box-shadow:0 4px 16px rgba(0,0,0,0.15);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* Status Bar */
+.status-bar{
+  height:32px;display:flex;align-items:center;justify-content:center;
+  background:var(--status-bg);border-top:1px solid var(--border);
+  font-size:0.72rem;color:var(--text-muted);flex-shrink:0;gap:6px;
+}
+.status-bar a{color:var(--accent);text-decoration:none;font-weight:600}
+.status-bar a:hover{text-decoration:underline}
+/* Badge */
+.freesuite-badge{
+  position:fixed;bottom:44px;right:16px;
+  display:flex;align-items:center;gap:5px;
+  background:var(--bg-secondary);border:1px solid var(--border);
+  border-radius:8px;padding:5px 10px;font-size:0.7rem;
+  color:var(--text-muted);text-decoration:none;
+  transition:border-color .2s,color .2s;z-index:50;
+}
+.freesuite-badge:hover{border-color:var(--accent);color:var(--text)}
+.freesuite-badge svg{flex-shrink:0}
+@media(max-width:480px){
+  .header{padding:0 14px}
+  .search-section{padding:14px 14px 0}
+  .categories-scroll{padding:0 14px 12px}
+  .grid-section{padding:8px 14px 14px}
+  .emoji-grid{grid-template-columns:repeat(auto-fill,minmax(40px,1fr))}
+  .emoji-cell{font-size:1.45rem}
+  .freesuite-badge{bottom:38px;right:10px}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="/" class="header-logo">freeemojipicker.app</a>
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+    <span id="themeIcon">🌙</span>
+  </button>
+</header>
+
+<div class="search-section">
+  <div class="search-wrap">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" class="search-input" id="searchInput" placeholder="Search emojis..." autocomplete="off" spellcheck="false">
+    <button class="search-clear" id="searchClear" aria-label="Clear search">&times;</button>
+  </div>
+</div>
+
+<nav class="categories-section">
+  <div class="categories-scroll" id="categoryTabs"></div>
+</nav>
+
+<main class="grid-section">
+  <div class="grid-container" id="emojiContainer"></div>
+</main>
+
+<div class="toast" id="toast">Copied!</div>
+
+<div class="status-bar">
+  <span>Click any emoji to copy</span>
+</div>
+
+<a href="https://freesuite.app" target="_blank" rel="noopener" class="freesuite-badge">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+  by freesuite.app
+</a>
+
+<script>
+const CATEGORIES = [
+  {id:'smileys',emoji:'😀',label:'Smileys',range:[[0x1F600,0x1F64F],[0x1F910,0x1F92F],[0x1F970,0x1F976],[0x1F978,0x1F97A],[0x1F9D0,0x1F9D0],[0x263A,0x263A],[0x2639,0x2639]]},
+  {id:'people',emoji:'👋',label:'People',range:[[0x1F466,0x1F487],[0x1F4AA,0x1F4AA],[0x1F9B0,0x1F9B9],[0x1F9D1,0x1F9DD],[0x1F44A,0x1F44F],[0x1F440,0x1F443],[0x1F446,0x1F44D],[0x1F4A4,0x1F4A4],[0x270A,0x270D],[0x1F90A,0x1F90F],[0x1F918,0x1F91F],[0x1F930,0x1F93A],[0x1F977,0x1F977]]},
+  {id:'animals',emoji:'🐱',label:'Animals',range:[[0x1F400,0x1F43F],[0x1F980,0x1F9AE]]},
+  {id:'food',emoji:'🍕',label:'Food',range:[[0x1F344,0x1F37F],[0x1F950,0x1F96F],[0x1F9C0,0x1F9CB]]},
+  {id:'activities',emoji:'⚽',label:'Activities',range:[[0x1F380,0x1F393],[0x1F396,0x1F397],[0x1F399,0x1F39B],[0x1F39E,0x1F3A0],[0x1F3A1,0x1F3CA],[0x1F3CF,0x1F3D3],[0x1F938,0x1F93E],[0x1F94A,0x1F94F],[0x265F,0x265F],[0x26BD,0x26BE]]},
+  {id:'travel',emoji:'✈️',label:'Travel',range:[[0x1F680,0x1F6C5],[0x1F6CC,0x1F6CC],[0x1F6D0,0x1F6D2],[0x1F6E0,0x1F6E5],[0x1F6E9,0x1F6E9],[0x1F6EB,0x1F6EC],[0x1F6F0,0x1F6F0],[0x1F6F3,0x1F6FA],[0x2708,0x2708]]},
+  {id:'objects',emoji:'💡',label:'Objects',range:[[0x1F4A1,0x1F4A3],[0x1F4B0,0x1F4BE],[0x1F4BF,0x1F4CB],[0x1F4CC,0x1F4DA],[0x1F4DC,0x1F4F7],[0x1F4F9,0x1F4FD],[0x1F4FF,0x1F4FF],[0x1F500,0x1F53D],[0x1F550,0x1F567],[0x1F56F,0x1F570],[0x1F573,0x1F57A]]},
+  {id:'symbols',emoji:'❤️',label:'Symbols',range:[[0x2764,0x2764],[0x1F494,0x1F49F],[0x1F4A0,0x1F4A0],[0x2600,0x2604],[0x2614,0x2615],[0x267B,0x267B],[0x2693,0x2693],[0x2660,0x2668],[0x2702,0x2702],[0x2705,0x2705],[0x2709,0x2709],[0x270F,0x270F],[0x2712,0x2712],[0x2714,0x2714],[0x2716,0x2716],[0x2728,0x2728],[0x2733,0x2734],[0x2744,0x2744],[0x2747,0x2747],[0x274C,0x274C],[0x274E,0x274E],[0x2753,0x2755],[0x2757,0x2757],[0x2763,0x2763],[0x2795,0x2797],[0x27A1,0x27A1],[0x27B0,0x27B0],[0x27BF,0x27BF]]},
+  {id:'flags',emoji:'🏁',label:'Flags',range:[[0x1F1E0,0x1F1FF],[0x1F3C1,0x1F3C1],[0x1F3F3,0x1F3F4],[0x1F6A9,0x1F6A9]]}
+];
+
+const EMOJI_NAMES = {};
+function getEmojiName(cp) {
+  if (cp >= 0x1F600 && cp <= 0x1F64F) return 'face';
+  if (cp >= 0x1F910 && cp <= 0x1F92F) return 'face';
+  if (cp >= 0x1F970 && cp <= 0x1F976) return 'face';
+  if (cp >= 0x1F400 && cp <= 0x1F43F) return 'animal';
+  if (cp >= 0x1F980 && cp <= 0x1F9AE) return 'animal';
+  if (cp >= 0x1F344 && cp <= 0x1F37F) return 'food drink';
+  if (cp >= 0x1F950 && cp <= 0x1F96F) return 'food';
+  if (cp >= 0x1F680 && cp <= 0x1F6C5) return 'travel vehicle';
+  if (cp >= 0x1F4B0 && cp <= 0x1F4FD) return 'object';
+  return '';
+}
+
+function buildEmojiList(cat) {
+  const emojis = [];
+  for (const [start, end] of cat.range) {
+    for (let cp = start; cp <= end; cp++) {
+      const ch = String.fromCodePoint(cp);
+      // Skip surrogates and non-printable
+      if (ch.trim().length === 0) continue;
+      emojis.push({ char: ch, cp });
+    }
+  }
+  return emojis;
+}
+
+// Flag emojis: combine regional indicator pairs for common flags
+function buildFlagEmojis() {
+  const flagCodes = [
+    'US','GB','FR','DE','JP','CN','KR','IN','BR','MX','CA','AU','IT','ES','RU',
+    'NL','SE','NO','DK','FI','CH','AT','BE','PT','PL','IE','NZ','AR','CL','CO',
+    'PE','ZA','NG','EG','KE','GH','MA','TH','VN','PH','MY','SG','ID','TW','HK',
+    'AE','SA','IL','TR','GR','UA','CZ','HU','RO','BG','HR','SK','SI','LT','LV',
+    'EE','IS','LU','MT','CY','JM','TT','BB','DO','CU','PR','PA','CR','GT','HN',
+    'SV','NI','EC','VE','BO','PY','UY','QA','KW','BH','OM','JO','LB','IQ','PK',
+    'BD','LK','NP','MM','KH','LA','MN','KZ','UZ','GE','AM','AZ'
+  ];
+  return flagCodes.map(code => {
+    const chars = [...code].map(c => String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65));
+    return { char: chars.join(''), cp: code, isFlag: true };
+  });
+}
+
+let allCategories = CATEGORIES.map(cat => {
+  const emojis = cat.id === 'flags'
+    ? [...buildEmojiList(cat).filter(e => e.cp < 0x1F1E0 || e.cp > 0x1F1FF), ...buildFlagEmojis()]
+    : buildEmojiList(cat);
+  return { ...cat, emojis };
+});
+
+let activeCategory = 'smileys';
+let searchQuery = '';
+let toastTimeout = null;
+
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+// Theme
+function getTheme() { return localStorage.getItem('suite_theme') || 'light'; }
+function setTheme(t) {
+  localStorage.setItem('suite_theme', t);
+  document.documentElement.setAttribute('data-theme', t);
+  $('#themeIcon').textContent = t === 'dark' ? '☀️' : '🌙';
+}
+setTheme(getTheme());
+$('#themeToggle').addEventListener('click', () => setTheme(getTheme() === 'dark' ? 'light' : 'dark'));
+
+// Categories
+function renderTabs() {
+  const container = $('#categoryTabs');
+  container.innerHTML = allCategories.map(cat =>
+    `<button class="cat-tab${cat.id === activeCategory ? ' active' : ''}" data-cat="${cat.id}">
+      <span class="cat-emoji">${cat.emoji}</span>${cat.label}
+    </button>`
+  ).join('');
+  container.querySelectorAll('.cat-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeCategory = btn.dataset.cat;
+      searchQuery = '';
+      $('#searchInput').value = '';
+      $('#searchClear').classList.remove('visible');
+      renderTabs();
+      renderGrid();
+    });
+  });
+}
+
+// Grid
+function renderGrid() {
+  const container = $('#emojiContainer');
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    let results = [];
+    allCategories.forEach(cat => {
+      const matched = cat.emojis.filter(e => {
+        const name = getEmojiName(e.cp);
+        return cat.label.toLowerCase().includes(q) || name.includes(q) || (e.isFlag && e.cp.toLowerCase().includes(q));
+      });
+      if (matched.length) results.push({ label: cat.label, emojis: matched });
+    });
+    if (!results.length) {
+      container.innerHTML = `<div class="no-results"><div class="no-emoji">🔍</div>No emojis found for "${searchQuery}"</div>`;
+      return;
+    }
+    container.innerHTML = results.map(group =>
+      `<div class="grid-label">${group.label}</div><div class="emoji-grid">${group.emojis.map(e =>
+        `<div class="emoji-cell" data-emoji="${e.char}" role="button" tabindex="0" title="Click to copy">${e.char}</div>`
+      ).join('')}</div>`
+    ).join('');
+  } else {
+    const cat = allCategories.find(c => c.id === activeCategory);
+    if (!cat) return;
+    container.innerHTML =
+      `<div class="grid-label">${cat.label}</div><div class="emoji-grid">${cat.emojis.map(e =>
+        `<div class="emoji-cell" data-emoji="${e.char}" role="button" tabindex="0" title="Click to copy">${e.char}</div>`
+      ).join('')}</div>`;
+  }
+  container.querySelectorAll('.emoji-cell').forEach(cell => {
+    cell.addEventListener('click', () => copyEmoji(cell.dataset.emoji));
+    cell.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copyEmoji(cell.dataset.emoji); }});
+  });
+}
+
+function copyEmoji(emoji) {
+  navigator.clipboard.writeText(emoji).then(() => showToast(`Copied ${emoji}`)).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = emoji; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta); showToast(`Copied ${emoji}`);
+  });
+}
+
+function showToast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove('show'), 1500);
+}
+
+// Search
+$('#searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value.trim();
+  $('#searchClear').classList.toggle('visible', searchQuery.length > 0);
+  renderGrid();
+});
+$('#searchClear').addEventListener('click', () => {
+  searchQuery = '';
+  $('#searchInput').value = '';
+  $('#searchClear').classList.remove('visible');
+  renderGrid();
+  $('#searchInput').focus();
+});
+
+// Init
+renderTabs();
+renderGrid();
+
+// Register SW
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
