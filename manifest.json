@@ -1,0 +1,16 @@
+{
+  "name": "freeemojipicker.app",
+  "short_name": "Emoji Picker",
+  "description": "Copy Emojis Free — Search, Click, Paste",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf9f6",
+  "theme_color": "#C49A2A",
+  "icons": [
+    {
+      "src": "og-image.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
