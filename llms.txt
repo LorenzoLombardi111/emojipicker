@@ -22,6 +22,19 @@ freeemojipicker.app is a free, browser-based emoji picker with 900+ emojis acros
 - PWA-ready with service worker and manifest
 - Built with vanilla HTML, CSS, and JavaScript (single index.html file)
 
+## Pages
+
+- https://freeemojipicker.app/ — Main emoji picker app
+- https://freeemojipicker.app/emoji-copy-paste.html — How emoji copy and paste works, 50 most popular emojis quick-copy grid
+- https://freeemojipicker.app/emoji-meanings.html — Guide to 50 commonly misunderstood emojis with actual meanings
+- https://freeemojipicker.app/heart-emojis.html — Every heart emoji with color meanings and copy buttons
+- https://freeemojipicker.app/smiley-face-emojis.html — All smiley face emojis grouped by emotion with descriptions
+- https://freeemojipicker.app/emoji-for-instagram.html — Curated emoji lists for Instagram bios, captions, and stories
+
+## Full details
+
+See https://freeemojipicker.app/llms-full.txt
+
 ## URL
 
 https://freeemojipicker.app/

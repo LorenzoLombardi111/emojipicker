@@ -1,0 +1,63 @@
+# freeemojipicker.app — Full Details
+
+> Free emoji picker — search, click, copy, and paste emojis instantly.
+
+## About
+
+freeemojipicker.app is a free, browser-based emoji picker with 927 emojis across 9 categories. It runs entirely in the browser with no server-side processing, no tracking, and no ads. Users search by name or keyword, click to copy, and paste anywhere.
+
+## Key Facts
+
+- 927 emojis included inline as a JavaScript array (no external API dependency)
+- 9 categories: Smileys (113), People (85), Animals (121), Food (100), Activities (71), Travel (97), Objects (106), Symbols (179), Flags (55)
+- Instant search filtering by emoji name and keywords across all categories
+- Single-click copy to clipboard using the Clipboard API
+- Multi-select mode: toggle on, click emojis to build a string, copy all at once
+- Skin tone support for hand and people emojis (6 tones: default + 5 modifiers)
+- On desktop: hover to show skin tone popup; on mobile: long-press for bottom sheet
+- Recently copied emojis saved in localStorage (last 20), persists across sessions
+- Dark mode toggle with localStorage persistence (key: "suite_theme")
+- Fully responsive: ~10 columns desktop, 6 tablet, 5 mobile
+- PWA-ready with service worker (cache-first) and web app manifest
+- Built with vanilla HTML, CSS, and JavaScript — single index.html file, no build step
+- Fonts: DM Sans (UI), Lora (content headings), loaded async from Google Fonts
+- Design system: light (#faf9f6 bg, #C49A2A accent) and dark (#141412 bg, #D4A835 accent)
+
+## Pages
+
+### Main App — https://freeemojipicker.app/
+The primary emoji picker interface. Full-screen app with search bar, category tabs, responsive emoji grid, multi-select toolbar, recently-copied bar, and status bar. Contains all 927 emojis inline. Below the app fold: SEO content with H1, 5 H2 informational sections, and 6 FAQ accordions.
+
+### Emoji Copy and Paste — https://freeemojipicker.app/emoji-copy-paste.html
+Target keyword: "emoji copy paste" (800K+ monthly searches). Explains how copy-paste works with emojis, why freeemojipicker.app is better than built-in keyboards. Includes a quick-copy grid of 50 most popular emojis. 3-step tutorial (Find, Click, Paste). Feature comparison grid. 4 FAQ items.
+
+### Emoji Meanings — https://freeemojipicker.app/emoji-meanings.html
+Target keyword: "emoji meanings" (1M+ monthly searches). Explains actual/cultural meanings of 50 commonly misunderstood emojis. Covers generational differences (Gen Z vs millennial usage), combo meanings, and context-dependent interpretation. Organized by category: Smileys, Gestures, Hearts, Objects, Communication. 4 FAQ items.
+
+### Heart Emojis — https://freeemojipicker.app/heart-emojis.html
+Target keyword: "heart emoji" (500K+ monthly searches). Every heart emoji variant with color meaning explained. Covers 9 colored hearts, 12+ decorative/animated hearts (sparkling, growing, beating, revolving, broken, fire, mending). Click-to-copy on each. Heart combination cards for occasions (Pride, Valentine's, healing, friendship). 3 FAQ items.
+
+### Smiley Face Emojis — https://freeemojipicker.app/smiley-face-emojis.html
+Target keyword: "smiley face emoji" (300K+ monthly searches). Every face emoji grouped by emotion: Happy, Love, Silly, Angry, Sad, Worried, Thinking. Each emoji shown with name and usage description. Click-to-copy on every emoji. 3 FAQ items.
+
+### Emojis for Instagram — https://freeemojipicker.app/emoji-for-instagram.html
+Target keyword: "emojis for instagram" (200K+ monthly searches). Curated emoji lists grouped by vibe: Aesthetic, Funny, Love, Travel, Food. Each section has individual copyable emojis and copy-ready combination cards with labels. Tips for effective emoji use in bios and captions. 3 FAQ items.
+
+## Technical Details
+
+- All pages share the same design system (CSS custom properties, DM Sans + Lora fonts)
+- Dark mode persists across pages via localStorage key "suite_theme"
+- All landing pages are standalone HTML with inline CSS — no shared stylesheet dependency
+- Every page includes JSON-LD structured data: Article, FAQPage, SoftwareApplication, BreadcrumbList
+- Every page includes Open Graph and Twitter Card meta tags
+- Internal linking: each landing page links to all other landing pages and the main app
+- Service worker caches main app assets for offline use
+- No JavaScript frameworks, no build tools, no external dependencies beyond Google Fonts
+
+## URL
+
+https://freeemojipicker.app/
+
+## Part of
+
+https://freesuite.app/
