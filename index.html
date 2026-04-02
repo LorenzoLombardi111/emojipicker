@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Free Emoji Picker — Search, Click, Copy | freeemojipicker.app</title>
+<meta name="description" content="Copy emojis free. Search, click, paste. 500+ emojis with skin tone support.">
+<meta property="og:title" content="freeemojipicker.app — Copy Emojis Free">
+<meta property="og:description" content="Search, Click, Paste — 500+ emojis with skin tone support">
+<meta property="og:image" content="https://freeemojipicker.app/og-image.svg">
+<meta property="og:url" content="https://freeemojipicker.app">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#faf9f6;--surface:#f4f2ee;--border:#e8e4dd;--text:#1a1917;--muted:#8a8780;--accent:#C49A2A;--font-ui:'DM Sans',sans-serif;--font-content:'Lora',serif}
+[data-theme="dark"]{--bg:#141412;--surface:#1e1c1a;--border:#2e2b27;--text:#f0ede8;--muted:#8a8780;--accent:#D4A835}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;transition:background .15s ease,color .15s ease}
+header{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.logo{font-size:15px;font-weight:600;color:var(--accent);text-decoration:none}
+.theme-toggle{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:14px;color:var(--text);transition:.15s ease}
+.theme-toggle:hover{border-color:var(--accent)}
+main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:16px}
+.search-wrap{width:100%;max-width:600px;position:relative;margin-bottom:12px}
+.search-wrap .icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none}
+#search{width:100%;font-family:var(--font-ui);font-size:15px;padding:12px 16px 12px 40px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);outline:none;transition:.15s ease}
+#search:focus{border-color:var(--accent)}
+#search::placeholder{color:var(--muted)}
+.multi-bar{width:100%;max-width:600px;display:none;align-items:center;gap:8px;margin-bottom:12px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px}
+.multi-bar.active{display:flex}
+.multi-field{flex:1;font-size:20px;min-height:32px;line-height:32px;overflow-x:auto;white-space:nowrap}
+.multi-bar button{font-family:var(--font-ui);font-size:12px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:.15s ease;white-space:nowrap}
+.multi-bar button.copy-all{background:var(--accent);color:#fff;border-color:var(--accent)}
+.toolbar{width:100%;max-width:600px;display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.toolbar .btn{font-family:var(--font-ui);font-size:12px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:.15s ease}
+.toolbar .btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.recent-bar{width:100%;max-width:600px;margin-bottom:12px;display:none}
+.recent-bar.visible{display:block}
+.recent-label{font-size:12px;color:var(--muted);margin-bottom:4px}
+.recent-emojis{display:flex;gap:4px;flex-wrap:wrap}
+.recent-emojis span{font-size:22px;cursor:pointer;padding:4px;border-radius:6px;transition:.15s ease}
+.recent-emojis span:hover{background:var(--surface);transform:scale(1.15)}
+.cat-tabs{display:flex;gap:8px;overflow-x:auto;width:100%;max-width:600px;margin-bottom:12px;padding-bottom:4px;scrollbar-width:none;-ms-overflow-style:none}
+.cat-tabs::-webkit-scrollbar{display:none}
+.cat-tab{display:flex;align-items:center;gap:4px;padding:8px 12px;border-radius:6px;background:var(--surface);border:1px solid var(--border);cursor:pointer;white-space:nowrap;font-size:12px;font-family:var(--font-ui);color:var(--text);transition:.15s ease;flex-shrink:0}
+.cat-tab:hover{border-color:var(--accent)}
+.cat-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.emoji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:4px;width:100%;max-width:600px;padding-bottom:12px}
+.emoji-cell{width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;border-radius:6px;transition:.15s ease;position:relative;user-select:none;-webkit-user-select:none}
+.emoji-cell:hover{background:var(--surface);transform:scale(1.15)}
+.emoji-count{font-size:12px;color:var(--muted);text-align:center;padding:8px 0;width:100%;max-width:600px}
+.no-results{text-align:center;color:var(--muted);padding:32px 0;font-family:var(--font-content);width:100%;max-width:600px}
+.toast{position:fixed;padding:6px 12px;background:var(--accent);color:#fff;border-radius:6px;font-size:12px;pointer-events:none;z-index:100;animation:fadeout 1s forwards}
+@keyframes fadeout{0%,70%{opacity:1}100%{opacity:0}}
+.skin-popup{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:4px;display:flex;gap:4px;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.skin-popup span{font-size:22px;cursor:pointer;padding:4px;border-radius:6px;transition:.15s ease}
+.skin-popup span:hover{background:var(--surface);transform:scale(1.15)}
+.skin-sheet{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--border);padding:16px;z-index:60;border-radius:16px 16px 0 0;box-shadow:0 -4px 16px rgba(0,0,0,.1)}
+.skin-sheet.open{display:block}
+.skin-sheet-title{font-size:14px;color:var(--muted);margin-bottom:12px;text-align:center}
+.skin-sheet-options{display:flex;justify-content:center;gap:12px;font-size:32px}
+.skin-sheet-options span{cursor:pointer;padding:8px;border-radius:8px;transition:.15s ease}
+.skin-sheet-options span:hover{background:var(--surface)}
+.skin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:55}
+.skin-overlay.open{display:block}
+.status-bar{height:32px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);flex-shrink:0}
+.badge{position:fixed;bottom:36px;right:16px;font-size:11px;color:var(--muted);font-family:var(--font-ui);text-decoration:none;z-index:10}
+.badge:hover{color:var(--accent)}
+@media(max-width:600px){
+  .emoji-grid{grid-template-columns:repeat(5,1fr)}
+  main{padding:12px 8px}
+}
+@media(min-width:601px) and (max-width:900px){
+  .emoji-grid{grid-template-columns:repeat(6,1fr)}
+}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="/">freeemojipicker.app</a>
+  <button class="theme-toggle" id="themeBtn" aria-label="Toggle dark mode">🌙</button>
+</header>
+<main>
+  <div class="search-wrap"><span class="icon">🔍</span><input type="text" id="search" placeholder="Search emojis..." autocomplete="off"></div>
+  <div class="toolbar"><button class="btn" id="multiToggle">Select Multiple</button></div>
+  <div class="multi-bar" id="multiBar"><div class="multi-field" id="multiField"></div><button class="copy-all" id="copyAll">Copy All</button><button id="clearMulti">Clear</button></div>
+  <div class="recent-bar" id="recentBar"><div class="recent-label">Recently copied</div><div class="recent-emojis" id="recentEmojis"></div></div>
+  <div class="cat-tabs" id="catTabs"></div>
+  <div class="emoji-grid" id="emojiGrid"></div>
+  <div class="emoji-count" id="emojiCount"></div>
+  <div class="no-results" id="noResults" style="display:none"></div>
+</main>
+<div class="skin-overlay" id="skinOverlay"></div>
+<div class="skin-sheet" id="skinSheet"><div class="skin-sheet-title">Choose skin tone</div><div class="skin-sheet-options" id="skinSheetOptions"></div></div>
+<a class="badge" href="https://freesuite.app" target="_blank" rel="noopener">by freesuite.app</a>
+<footer class="status-bar"><span id="statusLeft"></span><span>All processing in your browser</span></footer>
+<script>
+const SKIN_TONES = ['', '\u{1F3FB}', '\u{1F3FC}', '\u{1F3FD}', '\u{1F3FE}', '\u{1F3FF}'];
+const SKIN_CAPABLE = new Set();
+
+const EMOJIS = [
+// smileys
+{emoji:"😀",name:"grinning face",keywords:["happy","smile","joy","grin"],category:"smileys"},
+{emoji:"😃",name:"grinning face with big eyes",keywords:["happy","smile","joy"],category:"smileys"},
+{emoji:"😄",name:"grinning face with smiling eyes",keywords:["happy","smile","joy","laugh"],category:"smileys"},
+{emoji:"😁",name:"beaming face with smiling eyes",keywords:["happy","smile","grin"],category:"smileys"},
+{emoji:"😆",name:"grinning squinting face",keywords:["happy","laugh","satisfied"],category:"smileys"},
+{emoji:"😅",name:"grinning face with sweat",keywords:["hot","happy","laugh","sweat","relief"],category:"smileys"},
+{emoji:"🤣",name:"rolling on the floor laughing",keywords:["laugh","lol","rofl","funny"],category:"smileys"},
+{emoji:"😂",name:"face with tears of joy",keywords:["laugh","cry","happy","tears"],category:"smileys"},
+{emoji:"🙂",name:"slightly smiling face",keywords:["smile","happy"],category:"smileys"},
+{emoji:"🙃",name:"upside-down face",keywords:["flipped","silly","sarcasm"],category:"smileys"},
+{emoji:"😉",name:"winking face",keywords:["wink","flirt"],category:"smileys"},
+{emoji:"😊",name:"smiling face with smiling eyes",keywords:["happy","blush","smile"],category:"smileys"},
+{emoji:"😇",name:"smiling face with halo",keywords:["angel","innocent","heaven"],category:"smileys"},
+{emoji:"🥰",name:"smiling face with hearts",keywords:["love","crush","adore"],category:"smileys"},
+{emoji:"😍",name:"smiling face with heart-eyes",keywords:["love","crush","heart"],category:"smileys"},
+{emoji:"🤩",name:"star-struck",keywords:["star","eyes","amazing","wow"],category:"smileys"},
+{emoji:"😘",name:"face blowing a kiss",keywords:["kiss","love","flirt"],category:"smileys"},
+{emoji:"😗",name:"kissing face",keywords:["kiss","love"],category:"smileys"},
+{emoji:"☺️",name:"smiling face",keywords:["smile","happy","blush"],category:"smileys"},
+{emoji:"😚",name:"kissing face with closed eyes",keywords:["kiss","love"],category:"smileys"},
+{emoji:"😙",name:"kissing face with smiling eyes",keywords:["kiss","happy"],category:"smileys"},
+{emoji:"🥲",name:"smiling face with tear",keywords:["sad","happy","grateful","relieved"],category:"smileys"},
+{emoji:"😋",name:"face savoring food",keywords:["yummy","delicious","tongue"],category:"smileys"},
+{emoji:"😛",name:"face with tongue",keywords:["tongue","playful","silly"],category:"smileys"},
+{emoji:"😜",name:"winking face with tongue",keywords:["tongue","wink","playful"],category:"smileys"},
+{emoji:"🤪",name:"zany face",keywords:["crazy","wild","goofy"],category:"smileys"},
+{emoji:"😝",name:"squinting face with tongue",keywords:["tongue","playful","silly"],category:"smileys"},
+{emoji:"🤑",name:"money-mouth face",keywords:["money","rich","dollar"],category:"smileys"},
+{emoji:"🤗",name:"hugging face",keywords:["hug","warm","embrace"],category:"smileys"},
+{emoji:"🤭",name:"face with hand over mouth",keywords:["oops","giggle","shy"],category:"smileys"},
+{emoji:"🤫",name:"shushing face",keywords:["quiet","shh","secret"],category:"smileys"},
+{emoji:"🤔",name:"thinking face",keywords:["think","hmm","consider"],category:"smileys"},
+{emoji:"🤐",name:"zipper-mouth face",keywords:["secret","quiet","zip"],category:"smileys"},
+{emoji:"🤨",name:"face with raised eyebrow",keywords:["suspicious","skeptical","doubt"],category:"smileys"},
+{emoji:"😐",name:"neutral face",keywords:["neutral","indifferent","meh"],category:"smileys"},
+{emoji:"😑",name:"expressionless face",keywords:["blank","expressionless"],category:"smileys"},
+{emoji:"😶",name:"face without mouth",keywords:["silent","speechless","mute"],category:"smileys"},
+{emoji:"😏",name:"smirking face",keywords:["smirk","suggestive","flirt"],category:"smileys"},
+{emoji:"😒",name:"unamused face",keywords:["bored","unamused","meh"],category:"smileys"},
+{emoji:"🙄",name:"face with rolling eyes",keywords:["eyeroll","annoyed","whatever"],category:"smileys"},
+{emoji:"😬",name:"grimacing face",keywords:["grimace","awkward","nervous"],category:"smileys"},
+{emoji:"🤥",name:"lying face",keywords:["lie","pinocchio"],category:"smileys"},
+{emoji:"😌",name:"relieved face",keywords:["relieved","calm","peaceful"],category:"smileys"},
+{emoji:"😔",name:"pensive face",keywords:["sad","pensive","depressed"],category:"smileys"},
+{emoji:"😪",name:"sleepy face",keywords:["sleepy","tired"],category:"smileys"},
+{emoji:"🤤",name:"drooling face",keywords:["drool","hungry"],category:"smileys"},
+{emoji:"😴",name:"sleeping face",keywords:["sleep","zzz","tired"],category:"smileys"},
+{emoji:"😷",name:"face with medical mask",keywords:["mask","sick","doctor"],category:"smileys"},
+{emoji:"🤒",name:"face with thermometer",keywords:["sick","fever","ill"],category:"smileys"},
+{emoji:"🤕",name:"face with head-bandage",keywords:["hurt","injured","bandage"],category:"smileys"},
+{emoji:"🤢",name:"nauseated face",keywords:["sick","nausea","vomit","green"],category:"smileys"},
+{emoji:"🤮",name:"face vomiting",keywords:["sick","vomit","puke"],category:"smileys"},
+{emoji:"🥵",name:"hot face",keywords:["hot","sweating","heat"],category:"smileys"},
+{emoji:"🥶",name:"cold face",keywords:["cold","freezing","ice"],category:"smileys"},
+{emoji:"🥴",name:"woozy face",keywords:["dizzy","drunk","woozy"],category:"smileys"},
+{emoji:"😵",name:"face with crossed-out eyes",keywords:["dizzy","dead","knocked out"],category:"smileys"},
+{emoji:"😵‍💫",name:"face with spiral eyes",keywords:["dizzy","hypnotized","spiral"],category:"smileys"},
+{emoji:"🤯",name:"exploding head",keywords:["mind blown","shocked","explosion"],category:"smileys"},
+{emoji:"🤠",name:"cowboy hat face",keywords:["cowboy","hat","western"],category:"smileys"},
+{emoji:"🥳",name:"partying face",keywords:["party","celebrate","birthday"],category:"smileys"},
+{emoji:"🥸",name:"disguised face",keywords:["disguise","glasses","nose"],category:"smileys"},
+{emoji:"😎",name:"smiling face with sunglasses",keywords:["cool","sunglasses","confident"],category:"smileys"},
+{emoji:"🤓",name:"nerd face",keywords:["nerd","geek","glasses"],category:"smileys"},
+{emoji:"🧐",name:"face with monocle",keywords:["monocle","curious","thinking"],category:"smileys"},
+{emoji:"😕",name:"confused face",keywords:["confused","puzzled"],category:"smileys"},
+{emoji:"😟",name:"worried face",keywords:["worried","concerned","nervous"],category:"smileys"},
+{emoji:"🙁",name:"slightly frowning face",keywords:["frown","sad","disappointed"],category:"smileys"},
+{emoji:"☹️",name:"frowning face",keywords:["frown","sad"],category:"smileys"},
+{emoji:"😮",name:"face with open mouth",keywords:["surprised","shocked","wow"],category:"smileys"},
+{emoji:"😯",name:"hushed face",keywords:["surprised","hushed","wow"],category:"smileys"},
+{emoji:"😲",name:"astonished face",keywords:["astonished","shocked","amazed"],category:"smileys"},
+{emoji:"😳",name:"flushed face",keywords:["flushed","embarrassed","blush"],category:"smileys"},
+{emoji:"🥺",name:"pleading face",keywords:["pleading","puppy eyes","begging"],category:"smileys"},
+{emoji:"😦",name:"frowning face with open mouth",keywords:["frown","awn","surprise"],category:"smileys"},
+{emoji:"😧",name:"anguished face",keywords:["anguish","stunned"],category:"smileys"},
+{emoji:"😨",name:"fearful face",keywords:["fear","scared","shocked"],category:"smileys"},
+{emoji:"😰",name:"anxious face with sweat",keywords:["anxious","nervous","sweat"],category:"smileys"},
+{emoji:"😥",name:"sad but relieved face",keywords:["sad","relieved","sweat"],category:"smileys"},
+{emoji:"😢",name:"crying face",keywords:["cry","sad","tear"],category:"smileys"},
+{emoji:"😭",name:"loudly crying face",keywords:["cry","sad","tears","sob"],category:"smileys"},
+{emoji:"😱",name:"face screaming in fear",keywords:["scream","fear","horror","scared"],category:"smileys"},
+{emoji:"😖",name:"confounded face",keywords:["confused","quiver"],category:"smileys"},
+{emoji:"😣",name:"persevering face",keywords:["struggle","persevere"],category:"smileys"},
+{emoji:"😞",name:"disappointed face",keywords:["sad","disappointed"],category:"smileys"},
+{emoji:"😓",name:"downcast face with sweat",keywords:["sad","sweat","exercise"],category:"smileys"},
+{emoji:"😩",name:"weary face",keywords:["tired","weary","frustrated"],category:"smileys"},
+{emoji:"😫",name:"tired face",keywords:["tired","exhausted"],category:"smileys"},
+{emoji:"🥱",name:"yawning face",keywords:["yawn","tired","sleepy","bored"],category:"smileys"},
+{emoji:"😤",name:"face with steam from nose",keywords:["angry","frustrated","triumph"],category:"smileys"},
+{emoji:"😡",name:"pouting face",keywords:["angry","mad","rage","red"],category:"smileys"},
+{emoji:"😠",name:"angry face",keywords:["angry","mad"],category:"smileys"},
+{emoji:"🤬",name:"face with symbols on mouth",keywords:["swear","curse","angry"],category:"smileys"},
+{emoji:"😈",name:"smiling face with horns",keywords:["devil","evil","grin"],category:"smileys"},
+{emoji:"👿",name:"angry face with horns",keywords:["devil","angry","evil"],category:"smileys"},
+{emoji:"💀",name:"skull",keywords:["death","dead","skeleton"],category:"smileys"},
+{emoji:"☠️",name:"skull and crossbones",keywords:["death","danger","poison"],category:"smileys"},
+{emoji:"💩",name:"pile of poo",keywords:["poop","shit","crap"],category:"smileys"},
+{emoji:"🤡",name:"clown face",keywords:["clown","circus","funny"],category:"smileys"},
+{emoji:"👹",name:"ogre",keywords:["monster","ogre","red"],category:"smileys"},
+{emoji:"👺",name:"goblin",keywords:["monster","goblin","red"],category:"smileys"},
+{emoji:"👻",name:"ghost",keywords:["ghost","halloween","spooky"],category:"smileys"},
+{emoji:"👽",name:"alien",keywords:["alien","ufo","space"],category:"smileys"},
+{emoji:"👾",name:"alien monster",keywords:["alien","game","space invader"],category:"smileys"},
+{emoji:"🤖",name:"robot",keywords:["robot","machine","bot"],category:"smileys"},
+{emoji:"😺",name:"grinning cat",keywords:["cat","happy","smile"],category:"smileys"},
+{emoji:"😸",name:"grinning cat with smiling eyes",keywords:["cat","happy"],category:"smileys"},
+{emoji:"😹",name:"cat with tears of joy",keywords:["cat","laugh","happy"],category:"smileys"},
+{emoji:"😻",name:"smiling cat with heart-eyes",keywords:["cat","love","heart"],category:"smileys"},
+{emoji:"😼",name:"cat with wry smile",keywords:["cat","smirk"],category:"smileys"},
+{emoji:"😽",name:"kissing cat",keywords:["cat","kiss"],category:"smileys"},
+{emoji:"🙀",name:"weary cat",keywords:["cat","surprised","shocked"],category:"smileys"},
+{emoji:"😿",name:"crying cat",keywords:["cat","sad","cry"],category:"smileys"},
+{emoji:"😾",name:"pouting cat",keywords:["cat","angry","pout"],category:"smileys"},
+// people
+{emoji:"👋",name:"waving hand",keywords:["wave","hello","hi","goodbye"],category:"people",skinTone:true},
+{emoji:"🤚",name:"raised back of hand",keywords:["hand","backhand"],category:"people",skinTone:true},
+{emoji:"🖐️",name:"hand with fingers splayed",keywords:["hand","fingers","palm"],category:"people",skinTone:true},
+{emoji:"✋",name:"raised hand",keywords:["hand","stop","high five"],category:"people",skinTone:true},
+{emoji:"🖖",name:"vulcan salute",keywords:["spock","star trek","hand"],category:"people",skinTone:true},
+{emoji:"👌",name:"ok hand",keywords:["ok","perfect","good"],category:"people",skinTone:true},
+{emoji:"🤌",name:"pinched fingers",keywords:["italian","hand","gesture"],category:"people",skinTone:true},
+{emoji:"🤏",name:"pinching hand",keywords:["small","tiny","pinch"],category:"people",skinTone:true},
+{emoji:"✌️",name:"victory hand",keywords:["peace","victory","two"],category:"people",skinTone:true},
+{emoji:"🤞",name:"crossed fingers",keywords:["luck","hope","crossed"],category:"people",skinTone:true},
+{emoji:"🤟",name:"love-you gesture",keywords:["love","hand","ily"],category:"people",skinTone:true},
+{emoji:"🤘",name:"sign of the horns",keywords:["rock","metal","horns"],category:"people",skinTone:true},
+{emoji:"🤙",name:"call me hand",keywords:["call","shaka","hang loose"],category:"people",skinTone:true},
+{emoji:"👈",name:"backhand index pointing left",keywords:["left","point","direction"],category:"people",skinTone:true},
+{emoji:"👉",name:"backhand index pointing right",keywords:["right","point","direction"],category:"people",skinTone:true},
+{emoji:"👆",name:"backhand index pointing up",keywords:["up","point"],category:"people",skinTone:true},
+{emoji:"🖕",name:"middle finger",keywords:["finger","rude"],category:"people",skinTone:true},
+{emoji:"👇",name:"backhand index pointing down",keywords:["down","point"],category:"people",skinTone:true},
+{emoji:"☝️",name:"index pointing up",keywords:["up","point","one"],category:"people",skinTone:true},
+{emoji:"👍",name:"thumbs up",keywords:["like","good","approve","yes"],category:"people",skinTone:true},
+{emoji:"👎",name:"thumbs down",keywords:["dislike","bad","disapprove","no"],category:"people",skinTone:true},
+{emoji:"✊",name:"raised fist",keywords:["fist","power","punch"],category:"people",skinTone:true},
+{emoji:"👊",name:"oncoming fist",keywords:["punch","fist bump"],category:"people",skinTone:true},
+{emoji:"🤛",name:"left-facing fist",keywords:["fist bump","left"],category:"people",skinTone:true},
+{emoji:"🤜",name:"right-facing fist",keywords:["fist bump","right"],category:"people",skinTone:true},
+{emoji:"👏",name:"clapping hands",keywords:["clap","applause","bravo"],category:"people",skinTone:true},
+{emoji:"🙌",name:"raising hands",keywords:["celebration","hooray","praise"],category:"people",skinTone:true},
+{emoji:"👐",name:"open hands",keywords:["hands","open","jazz"],category:"people",skinTone:true},
+{emoji:"🤲",name:"palms up together",keywords:["prayer","cupped hands"],category:"people",skinTone:true},
+{emoji:"🤝",name:"handshake",keywords:["shake","deal","agreement"],category:"people",skinTone:true},
+{emoji:"🙏",name:"folded hands",keywords:["pray","thanks","please","namaste"],category:"people",skinTone:true},
+{emoji:"✍️",name:"writing hand",keywords:["write","pen","hand"],category:"people",skinTone:true},
+{emoji:"💅",name:"nail polish",keywords:["nails","beauty","manicure"],category:"people",skinTone:true},
+{emoji:"🤳",name:"selfie",keywords:["selfie","phone","camera"],category:"people",skinTone:true},
+{emoji:"💪",name:"flexed biceps",keywords:["muscle","strong","arm","flex"],category:"people",skinTone:true},
+{emoji:"🦾",name:"mechanical arm",keywords:["prosthetic","robot","arm"],category:"people"},
+{emoji:"🦿",name:"mechanical leg",keywords:["prosthetic","robot","leg"],category:"people"},
+{emoji:"🦵",name:"leg",keywords:["leg","kick","limb"],category:"people",skinTone:true},
+{emoji:"🦶",name:"foot",keywords:["foot","kick","stomp"],category:"people",skinTone:true},
+{emoji:"👂",name:"ear",keywords:["ear","hear","listen"],category:"people",skinTone:true},
+{emoji:"👃",name:"nose",keywords:["nose","smell"],category:"people",skinTone:true},
+{emoji:"👀",name:"eyes",keywords:["eyes","look","see","watch"],category:"people"},
+{emoji:"👁️",name:"eye",keywords:["eye","look","see"],category:"people"},
+{emoji:"👅",name:"tongue",keywords:["tongue","taste","lick"],category:"people"},
+{emoji:"👄",name:"mouth",keywords:["mouth","lips","kiss"],category:"people"},
+{emoji:"👶",name:"baby",keywords:["baby","child","infant"],category:"people",skinTone:true},
+{emoji:"🧒",name:"child",keywords:["child","kid","young"],category:"people",skinTone:true},
+{emoji:"👦",name:"boy",keywords:["boy","male","child"],category:"people",skinTone:true},
+{emoji:"👧",name:"girl",keywords:["girl","female","child"],category:"people",skinTone:true},
+{emoji:"🧑",name:"person",keywords:["person","adult","gender neutral"],category:"people",skinTone:true},
+{emoji:"👱",name:"person blond hair",keywords:["blond","blonde","hair"],category:"people",skinTone:true},
+{emoji:"👨",name:"man",keywords:["man","male","adult"],category:"people",skinTone:true},
+{emoji:"🧔",name:"person beard",keywords:["beard","man"],category:"people",skinTone:true},
+{emoji:"👩",name:"woman",keywords:["woman","female","adult"],category:"people",skinTone:true},
+{emoji:"🧓",name:"older person",keywords:["old","elder","senior"],category:"people",skinTone:true},
+{emoji:"👴",name:"old man",keywords:["old","man","grandfather"],category:"people",skinTone:true},
+{emoji:"👵",name:"old woman",keywords:["old","woman","grandmother"],category:"people",skinTone:true},
+{emoji:"🙍",name:"person frowning",keywords:["frown","sad","disappointed"],category:"people",skinTone:true},
+{emoji:"🙎",name:"person pouting",keywords:["pout","angry"],category:"people",skinTone:true},
+{emoji:"🙅",name:"person gesturing no",keywords:["no","forbidden","denied"],category:"people",skinTone:true},
+{emoji:"🙆",name:"person gesturing ok",keywords:["ok","yes","agree"],category:"people",skinTone:true},
+{emoji:"💁",name:"person tipping hand",keywords:["information","sassy"],category:"people",skinTone:true},
+{emoji:"🙋",name:"person raising hand",keywords:["hand","raise","question"],category:"people",skinTone:true},
+{emoji:"🧏",name:"deaf person",keywords:["deaf","ear","accessibility"],category:"people",skinTone:true},
+{emoji:"🙇",name:"person bowing",keywords:["bow","sorry","respect"],category:"people",skinTone:true},
+{emoji:"🤦",name:"person facepalming",keywords:["facepalm","disappointed","disbelief"],category:"people",skinTone:true},
+{emoji:"🤷",name:"person shrugging",keywords:["shrug","idk","whatever"],category:"people",skinTone:true},
+{emoji:"👮",name:"police officer",keywords:["police","cop","officer","law"],category:"people",skinTone:true},
+{emoji:"💂",name:"guard",keywords:["guard","soldier","british"],category:"people",skinTone:true},
+{emoji:"🥷",name:"ninja",keywords:["ninja","stealth","hidden"],category:"people",skinTone:true},
+{emoji:"👷",name:"construction worker",keywords:["construction","worker","build"],category:"people",skinTone:true},
+{emoji:"🤴",name:"prince",keywords:["prince","royal","king"],category:"people",skinTone:true},
+{emoji:"👸",name:"princess",keywords:["princess","royal","queen"],category:"people",skinTone:true},
+{emoji:"🧙",name:"mage",keywords:["wizard","mage","magic"],category:"people",skinTone:true},
+{emoji:"🧚",name:"fairy",keywords:["fairy","magic","wings"],category:"people",skinTone:true},
+{emoji:"🧛",name:"vampire",keywords:["vampire","dracula"],category:"people",skinTone:true},
+{emoji:"🧜",name:"merperson",keywords:["mermaid","merman","sea"],category:"people",skinTone:true},
+{emoji:"🧝",name:"elf",keywords:["elf","magic","fantasy"],category:"people",skinTone:true},
+{emoji:"💃",name:"woman dancing",keywords:["dance","salsa","woman"],category:"people",skinTone:true},
+{emoji:"🕺",name:"man dancing",keywords:["dance","disco","man"],category:"people",skinTone:true},
+{emoji:"👯",name:"people with bunny ears",keywords:["dance","party","bunny"],category:"people"},
+{emoji:"👫",name:"woman and man holding hands",keywords:["couple","holding hands"],category:"people"},
+{emoji:"👬",name:"men holding hands",keywords:["couple","men","holding hands"],category:"people"},
+{emoji:"👭",name:"women holding hands",keywords:["couple","women","holding hands"],category:"people"},
+{emoji:"👪",name:"family",keywords:["family","home","parents"],category:"people"},
+// animals
+{emoji:"🐶",name:"dog face",keywords:["dog","puppy","pet"],category:"animals"},
+{emoji:"🐱",name:"cat face",keywords:["cat","kitten","pet"],category:"animals"},
+{emoji:"🐭",name:"mouse face",keywords:["mouse","rodent"],category:"animals"},
+{emoji:"🐹",name:"hamster",keywords:["hamster","pet","rodent"],category:"animals"},
+{emoji:"🐰",name:"rabbit face",keywords:["rabbit","bunny","pet"],category:"animals"},
+{emoji:"🦊",name:"fox",keywords:["fox","animal","wild"],category:"animals"},
+{emoji:"🐻",name:"bear",keywords:["bear","animal","wild"],category:"animals"},
+{emoji:"🐼",name:"panda",keywords:["panda","bear","cute"],category:"animals"},
+{emoji:"🐻‍❄️",name:"polar bear",keywords:["polar","bear","arctic","white"],category:"animals"},
+{emoji:"🐨",name:"koala",keywords:["koala","animal","australia"],category:"animals"},
+{emoji:"🐯",name:"tiger face",keywords:["tiger","cat","wild"],category:"animals"},
+{emoji:"🦁",name:"lion",keywords:["lion","king","wild","cat"],category:"animals"},
+{emoji:"🐮",name:"cow face",keywords:["cow","farm","moo"],category:"animals"},
+{emoji:"🐷",name:"pig face",keywords:["pig","farm","oink"],category:"animals"},
+{emoji:"🐸",name:"frog",keywords:["frog","toad","green"],category:"animals"},
+{emoji:"🐵",name:"monkey face",keywords:["monkey","primate","ape"],category:"animals"},
+{emoji:"🙈",name:"see-no-evil monkey",keywords:["monkey","eyes","shy"],category:"animals"},
+{emoji:"🙉",name:"hear-no-evil monkey",keywords:["monkey","ears"],category:"animals"},
+{emoji:"🙊",name:"speak-no-evil monkey",keywords:["monkey","mouth","secret"],category:"animals"},
+{emoji:"🐔",name:"chicken",keywords:["chicken","bird","farm"],category:"animals"},
+{emoji:"🐧",name:"penguin",keywords:["penguin","bird","cold"],category:"animals"},
+{emoji:"🐦",name:"bird",keywords:["bird","fly","tweet"],category:"animals"},
+{emoji:"🐤",name:"baby chick",keywords:["chick","bird","baby"],category:"animals"},
+{emoji:"🐣",name:"hatching chick",keywords:["chick","egg","hatch"],category:"animals"},
+{emoji:"🐥",name:"front-facing baby chick",keywords:["chick","bird","baby"],category:"animals"},
+{emoji:"🦆",name:"duck",keywords:["duck","bird","quack"],category:"animals"},
+{emoji:"🦅",name:"eagle",keywords:["eagle","bird","america"],category:"animals"},
+{emoji:"🦉",name:"owl",keywords:["owl","bird","wise","night"],category:"animals"},
+{emoji:"🦇",name:"bat",keywords:["bat","vampire","night"],category:"animals"},
+{emoji:"🐺",name:"wolf",keywords:["wolf","howl","wild"],category:"animals"},
+{emoji:"🐗",name:"boar",keywords:["boar","pig","wild"],category:"animals"},
+{emoji:"🐴",name:"horse face",keywords:["horse","pony"],category:"animals"},
+{emoji:"🦄",name:"unicorn",keywords:["unicorn","magic","fantasy","horse"],category:"animals"},
+{emoji:"🐝",name:"honeybee",keywords:["bee","honey","insect","buzz"],category:"animals"},
+{emoji:"🪱",name:"worm",keywords:["worm","insect","earth"],category:"animals"},
+{emoji:"🐛",name:"bug",keywords:["bug","insect","caterpillar"],category:"animals"},
+{emoji:"🦋",name:"butterfly",keywords:["butterfly","insect","pretty"],category:"animals"},
+{emoji:"🐌",name:"snail",keywords:["snail","slow","shell"],category:"animals"},
+{emoji:"🐞",name:"lady beetle",keywords:["ladybug","insect","lucky"],category:"animals"},
+{emoji:"🐜",name:"ant",keywords:["ant","insect","bug"],category:"animals"},
+{emoji:"🦟",name:"mosquito",keywords:["mosquito","insect","bug","bite"],category:"animals"},
+{emoji:"🦗",name:"cricket",keywords:["cricket","insect","chirp"],category:"animals"},
+{emoji:"🕷️",name:"spider",keywords:["spider","web","insect"],category:"animals"},
+{emoji:"🕸️",name:"spider web",keywords:["web","spider","cobweb"],category:"animals"},
+{emoji:"🦂",name:"scorpion",keywords:["scorpion","zodiac","insect"],category:"animals"},
+{emoji:"🐢",name:"turtle",keywords:["turtle","slow","shell","tortoise"],category:"animals"},
+{emoji:"🐍",name:"snake",keywords:["snake","reptile","hiss"],category:"animals"},
+{emoji:"🦎",name:"lizard",keywords:["lizard","reptile","gecko"],category:"animals"},
+{emoji:"🐙",name:"octopus",keywords:["octopus","sea","tentacle"],category:"animals"},
+{emoji:"🦑",name:"squid",keywords:["squid","sea","tentacle"],category:"animals"},
+{emoji:"🦐",name:"shrimp",keywords:["shrimp","prawn","seafood"],category:"animals"},
+{emoji:"🦞",name:"lobster",keywords:["lobster","seafood","claw"],category:"animals"},
+{emoji:"🦀",name:"crab",keywords:["crab","seafood","cancer"],category:"animals"},
+{emoji:"🐡",name:"blowfish",keywords:["blowfish","fish","puffer"],category:"animals"},
+{emoji:"🐠",name:"tropical fish",keywords:["fish","tropical","nemo"],category:"animals"},
+{emoji:"🐟",name:"fish",keywords:["fish","sea","ocean"],category:"animals"},
+{emoji:"🐬",name:"dolphin",keywords:["dolphin","sea","ocean","flipper"],category:"animals"},
+{emoji:"🐳",name:"spouting whale",keywords:["whale","sea","ocean"],category:"animals"},
+{emoji:"🐋",name:"whale",keywords:["whale","sea","ocean","blue"],category:"animals"},
+{emoji:"🦈",name:"shark",keywords:["shark","fish","jaws","danger"],category:"animals"},
+{emoji:"🐊",name:"crocodile",keywords:["crocodile","alligator","reptile"],category:"animals"},
+{emoji:"🐅",name:"tiger",keywords:["tiger","wild","cat"],category:"animals"},
+{emoji:"🐆",name:"leopard",keywords:["leopard","wild","cat","spots"],category:"animals"},
+{emoji:"🦓",name:"zebra",keywords:["zebra","stripes","horse"],category:"animals"},
+{emoji:"🦍",name:"gorilla",keywords:["gorilla","ape","primate"],category:"animals"},
+{emoji:"🦧",name:"orangutan",keywords:["orangutan","ape","primate"],category:"animals"},
+{emoji:"🐘",name:"elephant",keywords:["elephant","big","trunk"],category:"animals"},
+{emoji:"🦛",name:"hippopotamus",keywords:["hippo","hippopotamus","animal"],category:"animals"},
+{emoji:"🦏",name:"rhinoceros",keywords:["rhino","rhinoceros","horn"],category:"animals"},
+{emoji:"🐪",name:"camel",keywords:["camel","desert","hump"],category:"animals"},
+{emoji:"🐫",name:"two-hump camel",keywords:["camel","desert","bactrian"],category:"animals"},
+{emoji:"🦒",name:"giraffe",keywords:["giraffe","tall","spots"],category:"animals"},
+{emoji:"🦘",name:"kangaroo",keywords:["kangaroo","australia","jump"],category:"animals"},
+{emoji:"🐃",name:"water buffalo",keywords:["buffalo","water","ox"],category:"animals"},
+{emoji:"🐄",name:"cow",keywords:["cow","farm","milk"],category:"animals"},
+{emoji:"🐎",name:"horse",keywords:["horse","race","gallop"],category:"animals"},
+{emoji:"🐖",name:"pig",keywords:["pig","farm","pork"],category:"animals"},
+{emoji:"🐏",name:"ram",keywords:["ram","sheep","zodiac"],category:"animals"},
+{emoji:"🐑",name:"ewe",keywords:["sheep","wool","lamb"],category:"animals"},
+{emoji:"🐐",name:"goat",keywords:["goat","animal","greatest"],category:"animals"},
+{emoji:"🦌",name:"deer",keywords:["deer","bambi","nature"],category:"animals"},
+{emoji:"🐕",name:"dog",keywords:["dog","pet","puppy"],category:"animals"},
+{emoji:"🐩",name:"poodle",keywords:["poodle","dog","fancy"],category:"animals"},
+{emoji:"🐈",name:"cat",keywords:["cat","pet","kitty"],category:"animals"},
+{emoji:"🐓",name:"rooster",keywords:["rooster","chicken","cock"],category:"animals"},
+{emoji:"🦃",name:"turkey",keywords:["turkey","bird","thanksgiving"],category:"animals"},
+{emoji:"🦚",name:"peacock",keywords:["peacock","bird","beautiful"],category:"animals"},
+{emoji:"🦜",name:"parrot",keywords:["parrot","bird","pirate","talk"],category:"animals"},
+{emoji:"🦢",name:"swan",keywords:["swan","bird","graceful","lake"],category:"animals"},
+{emoji:"🦩",name:"flamingo",keywords:["flamingo","bird","pink"],category:"animals"},
+{emoji:"🕊️",name:"dove",keywords:["dove","peace","bird"],category:"animals"},
+{emoji:"🐇",name:"rabbit",keywords:["rabbit","bunny","pet"],category:"animals"},
+{emoji:"🦝",name:"raccoon",keywords:["raccoon","animal","trash panda"],category:"animals"},
+{emoji:"🦨",name:"skunk",keywords:["skunk","stink","animal"],category:"animals"},
+{emoji:"🦡",name:"badger",keywords:["badger","animal"],category:"animals"},
+{emoji:"🦦",name:"otter",keywords:["otter","cute","swim"],category:"animals"},
+{emoji:"🦥",name:"sloth",keywords:["sloth","slow","lazy"],category:"animals"},
+{emoji:"🐁",name:"mouse",keywords:["mouse","small","rodent"],category:"animals"},
+{emoji:"🐀",name:"rat",keywords:["rat","rodent"],category:"animals"},
+{emoji:"🐿️",name:"chipmunk",keywords:["chipmunk","squirrel","nut"],category:"animals"},
+{emoji:"🦔",name:"hedgehog",keywords:["hedgehog","spiny","cute"],category:"animals"},
+{emoji:"🐉",name:"dragon",keywords:["dragon","fantasy","fire"],category:"animals"},
+{emoji:"🐲",name:"dragon face",keywords:["dragon","face","fantasy"],category:"animals"},
+{emoji:"🌵",name:"cactus",keywords:["cactus","desert","plant"],category:"animals"},
+{emoji:"🌲",name:"evergreen tree",keywords:["tree","pine","christmas"],category:"animals"},
+{emoji:"🌳",name:"deciduous tree",keywords:["tree","nature","green"],category:"animals"},
+{emoji:"🌴",name:"palm tree",keywords:["palm","tree","tropical","beach"],category:"animals"},
+{emoji:"🌱",name:"seedling",keywords:["seedling","plant","grow"],category:"animals"},
+{emoji:"🌿",name:"herb",keywords:["herb","plant","green","leaf"],category:"animals"},
+{emoji:"🍀",name:"four leaf clover",keywords:["clover","luck","lucky","irish"],category:"animals"},
+{emoji:"🍁",name:"maple leaf",keywords:["maple","leaf","canada","fall"],category:"animals"},
+{emoji:"🍂",name:"fallen leaf",keywords:["leaf","fall","autumn"],category:"animals"},
+{emoji:"🍃",name:"leaf fluttering in wind",keywords:["leaf","wind","nature"],category:"animals"},
+{emoji:"🌸",name:"cherry blossom",keywords:["cherry","blossom","flower","spring"],category:"animals"},
+{emoji:"🌺",name:"hibiscus",keywords:["hibiscus","flower","tropical"],category:"animals"},
+{emoji:"🌻",name:"sunflower",keywords:["sunflower","flower","sun"],category:"animals"},
+{emoji:"🌹",name:"rose",keywords:["rose","flower","love","red"],category:"animals"},
+{emoji:"🌷",name:"tulip",keywords:["tulip","flower","spring"],category:"animals"},
+{emoji:"🌼",name:"blossom",keywords:["blossom","flower","yellow"],category:"animals"},
+{emoji:"💐",name:"bouquet",keywords:["bouquet","flowers","gift"],category:"animals"},
+{emoji:"🍄",name:"mushroom",keywords:["mushroom","toadstool","fungi"],category:"animals"},
+// food
+{emoji:"🍏",name:"green apple",keywords:["apple","green","fruit"],category:"food"},
+{emoji:"🍎",name:"red apple",keywords:["apple","red","fruit"],category:"food"},
+{emoji:"🍐",name:"pear",keywords:["pear","fruit","green"],category:"food"},
+{emoji:"🍊",name:"tangerine",keywords:["orange","tangerine","fruit"],category:"food"},
+{emoji:"🍋",name:"lemon",keywords:["lemon","citrus","yellow","fruit"],category:"food"},
+{emoji:"🍌",name:"banana",keywords:["banana","fruit","yellow"],category:"food"},
+{emoji:"🍉",name:"watermelon",keywords:["watermelon","fruit","summer"],category:"food"},
+{emoji:"🍇",name:"grapes",keywords:["grapes","fruit","wine","purple"],category:"food"},
+{emoji:"🍓",name:"strawberry",keywords:["strawberry","fruit","red","berry"],category:"food"},
+{emoji:"🫐",name:"blueberries",keywords:["blueberry","fruit","berry"],category:"food"},
+{emoji:"🍈",name:"melon",keywords:["melon","fruit","cantaloupe"],category:"food"},
+{emoji:"🍒",name:"cherries",keywords:["cherry","fruit","red"],category:"food"},
+{emoji:"🍑",name:"peach",keywords:["peach","fruit","butt"],category:"food"},
+{emoji:"🥭",name:"mango",keywords:["mango","fruit","tropical"],category:"food"},
+{emoji:"🍍",name:"pineapple",keywords:["pineapple","fruit","tropical"],category:"food"},
+{emoji:"🥥",name:"coconut",keywords:["coconut","tropical","palm"],category:"food"},
+{emoji:"🥝",name:"kiwi fruit",keywords:["kiwi","fruit","green"],category:"food"},
+{emoji:"🍅",name:"tomato",keywords:["tomato","vegetable","red"],category:"food"},
+{emoji:"🍆",name:"eggplant",keywords:["eggplant","aubergine","purple"],category:"food"},
+{emoji:"🥑",name:"avocado",keywords:["avocado","guacamole","green"],category:"food"},
+{emoji:"🥦",name:"broccoli",keywords:["broccoli","vegetable","green"],category:"food"},
+{emoji:"🥬",name:"leafy green",keywords:["lettuce","salad","vegetable"],category:"food"},
+{emoji:"🥒",name:"cucumber",keywords:["cucumber","vegetable","pickle"],category:"food"},
+{emoji:"🌶️",name:"hot pepper",keywords:["pepper","hot","spicy","chili"],category:"food"},
+{emoji:"🫑",name:"bell pepper",keywords:["pepper","vegetable"],category:"food"},
+{emoji:"🌽",name:"ear of corn",keywords:["corn","maize","vegetable"],category:"food"},
+{emoji:"🥕",name:"carrot",keywords:["carrot","vegetable","orange"],category:"food"},
+{emoji:"🧄",name:"garlic",keywords:["garlic","cooking","flavor"],category:"food"},
+{emoji:"🧅",name:"onion",keywords:["onion","cry","cooking"],category:"food"},
+{emoji:"🥔",name:"potato",keywords:["potato","vegetable","starch"],category:"food"},
+{emoji:"🍠",name:"roasted sweet potato",keywords:["sweet potato","yam"],category:"food"},
+{emoji:"🥐",name:"croissant",keywords:["croissant","bread","french","pastry"],category:"food"},
+{emoji:"🥯",name:"bagel",keywords:["bagel","bread","breakfast"],category:"food"},
+{emoji:"🍞",name:"bread",keywords:["bread","loaf","toast"],category:"food"},
+{emoji:"🥖",name:"baguette bread",keywords:["baguette","french","bread"],category:"food"},
+{emoji:"🥨",name:"pretzel",keywords:["pretzel","snack","twisted"],category:"food"},
+{emoji:"🧀",name:"cheese wedge",keywords:["cheese","dairy","cheddar"],category:"food"},
+{emoji:"🥚",name:"egg",keywords:["egg","breakfast","chicken"],category:"food"},
+{emoji:"🍳",name:"cooking",keywords:["egg","frying","pan","breakfast"],category:"food"},
+{emoji:"🧈",name:"butter",keywords:["butter","dairy","spread"],category:"food"},
+{emoji:"🥞",name:"pancakes",keywords:["pancakes","breakfast","stack"],category:"food"},
+{emoji:"🧇",name:"waffle",keywords:["waffle","breakfast","syrup"],category:"food"},
+{emoji:"🥓",name:"bacon",keywords:["bacon","meat","breakfast"],category:"food"},
+{emoji:"🥩",name:"cut of meat",keywords:["meat","steak","beef"],category:"food"},
+{emoji:"🍗",name:"poultry leg",keywords:["chicken","drumstick","leg","meat"],category:"food"},
+{emoji:"🍖",name:"meat on bone",keywords:["meat","bone","rib"],category:"food"},
+{emoji:"🌭",name:"hot dog",keywords:["hotdog","sausage","frankfurter"],category:"food"},
+{emoji:"🍔",name:"hamburger",keywords:["burger","hamburger","fast food"],category:"food"},
+{emoji:"🍟",name:"french fries",keywords:["fries","chips","fast food"],category:"food"},
+{emoji:"🍕",name:"pizza",keywords:["pizza","slice","cheese","italian"],category:"food"},
+{emoji:"🥪",name:"sandwich",keywords:["sandwich","bread","lunch"],category:"food"},
+{emoji:"🌮",name:"taco",keywords:["taco","mexican","food"],category:"food"},
+{emoji:"🌯",name:"burrito",keywords:["burrito","mexican","wrap"],category:"food"},
+{emoji:"🥙",name:"stuffed flatbread",keywords:["falafel","pita","kebab"],category:"food"},
+{emoji:"🧆",name:"falafel",keywords:["falafel","chickpea","middle eastern"],category:"food"},
+{emoji:"🥗",name:"green salad",keywords:["salad","healthy","vegetable"],category:"food"},
+{emoji:"🥫",name:"canned food",keywords:["canned","tin","soup"],category:"food"},
+{emoji:"🍝",name:"spaghetti",keywords:["pasta","spaghetti","italian","noodle"],category:"food"},
+{emoji:"🍜",name:"steaming bowl",keywords:["ramen","noodle","soup","pho"],category:"food"},
+{emoji:"🍲",name:"pot of food",keywords:["stew","soup","pot","curry"],category:"food"},
+{emoji:"🍛",name:"curry rice",keywords:["curry","rice","indian"],category:"food"},
+{emoji:"🍣",name:"sushi",keywords:["sushi","japanese","fish","rice"],category:"food"},
+{emoji:"🍱",name:"bento box",keywords:["bento","japanese","lunch"],category:"food"},
+{emoji:"🥟",name:"dumpling",keywords:["dumpling","gyoza","dim sum"],category:"food"},
+{emoji:"🍤",name:"fried shrimp",keywords:["shrimp","tempura","fried"],category:"food"},
+{emoji:"🍙",name:"rice ball",keywords:["rice","onigiri","japanese"],category:"food"},
+{emoji:"🍚",name:"cooked rice",keywords:["rice","bowl","white"],category:"food"},
+{emoji:"🍘",name:"rice cracker",keywords:["rice","cracker","japanese"],category:"food"},
+{emoji:"🍧",name:"shaved ice",keywords:["ice","snow cone","dessert"],category:"food"},
+{emoji:"🍨",name:"ice cream",keywords:["ice cream","dessert","sweet"],category:"food"},
+{emoji:"🍦",name:"soft ice cream",keywords:["ice cream","cone","soft serve"],category:"food"},
+{emoji:"🥧",name:"pie",keywords:["pie","dessert","baked"],category:"food"},
+{emoji:"🧁",name:"cupcake",keywords:["cupcake","cake","dessert"],category:"food"},
+{emoji:"🍰",name:"shortcake",keywords:["cake","shortcake","dessert","strawberry"],category:"food"},
+{emoji:"🎂",name:"birthday cake",keywords:["cake","birthday","candle","party"],category:"food"},
+{emoji:"🍮",name:"custard",keywords:["custard","pudding","flan","dessert"],category:"food"},
+{emoji:"🍭",name:"lollipop",keywords:["lollipop","candy","sweet"],category:"food"},
+{emoji:"🍬",name:"candy",keywords:["candy","sweet","sugar"],category:"food"},
+{emoji:"🍫",name:"chocolate bar",keywords:["chocolate","candy","sweet"],category:"food"},
+{emoji:"🍿",name:"popcorn",keywords:["popcorn","movie","snack"],category:"food"},
+{emoji:"🍩",name:"doughnut",keywords:["donut","doughnut","sweet","dessert"],category:"food"},
+{emoji:"🍪",name:"cookie",keywords:["cookie","biscuit","sweet"],category:"food"},
+{emoji:"🌰",name:"chestnut",keywords:["chestnut","nut","autumn"],category:"food"},
+{emoji:"🥜",name:"peanuts",keywords:["peanut","nut","snack"],category:"food"},
+{emoji:"🍯",name:"honey pot",keywords:["honey","sweet","bee"],category:"food"},
+{emoji:"🥛",name:"glass of milk",keywords:["milk","glass","dairy"],category:"food"},
+{emoji:"☕",name:"hot beverage",keywords:["coffee","tea","hot","drink"],category:"food"},
+{emoji:"🍵",name:"teacup without handle",keywords:["tea","green","matcha","drink"],category:"food"},
+{emoji:"🧃",name:"beverage box",keywords:["juice","box","drink"],category:"food"},
+{emoji:"🥤",name:"cup with straw",keywords:["soda","drink","straw"],category:"food"},
+{emoji:"🧋",name:"bubble tea",keywords:["boba","bubble tea","milk tea"],category:"food"},
+{emoji:"🍶",name:"sake",keywords:["sake","japanese","rice wine","drink"],category:"food"},
+{emoji:"🍺",name:"beer mug",keywords:["beer","mug","drink","alcohol"],category:"food"},
+{emoji:"🍻",name:"clinking beer mugs",keywords:["beer","cheers","toast"],category:"food"},
+{emoji:"🥂",name:"clinking glasses",keywords:["champagne","toast","cheers","celebrate"],category:"food"},
+{emoji:"🍷",name:"wine glass",keywords:["wine","red","drink","alcohol"],category:"food"},
+{emoji:"🥃",name:"tumbler glass",keywords:["whiskey","bourbon","drink"],category:"food"},
+{emoji:"🍸",name:"cocktail glass",keywords:["cocktail","martini","drink"],category:"food"},
+{emoji:"🍹",name:"tropical drink",keywords:["cocktail","tropical","drink"],category:"food"},
+{emoji:"🍾",name:"bottle with popping cork",keywords:["champagne","celebrate","bottle"],category:"food"},
+// activities
+{emoji:"⚽",name:"soccer ball",keywords:["soccer","football","ball","sport"],category:"activities"},
+{emoji:"🏀",name:"basketball",keywords:["basketball","ball","sport","nba"],category:"activities"},
+{emoji:"🏈",name:"american football",keywords:["football","american","nfl","sport"],category:"activities"},
+{emoji:"⚾",name:"baseball",keywords:["baseball","ball","sport","mlb"],category:"activities"},
+{emoji:"🥎",name:"softball",keywords:["softball","ball","sport"],category:"activities"},
+{emoji:"🎾",name:"tennis",keywords:["tennis","ball","racket","sport"],category:"activities"},
+{emoji:"🏐",name:"volleyball",keywords:["volleyball","ball","sport"],category:"activities"},
+{emoji:"🏉",name:"rugby football",keywords:["rugby","ball","sport"],category:"activities"},
+{emoji:"🥏",name:"flying disc",keywords:["frisbee","disc","sport"],category:"activities"},
+{emoji:"🎱",name:"pool 8 ball",keywords:["billiards","pool","8 ball"],category:"activities"},
+{emoji:"🏓",name:"ping pong",keywords:["ping pong","table tennis","paddle"],category:"activities"},
+{emoji:"🏸",name:"badminton",keywords:["badminton","racquet","shuttlecock"],category:"activities"},
+{emoji:"🏒",name:"ice hockey",keywords:["hockey","ice","stick","puck"],category:"activities"},
+{emoji:"🏑",name:"field hockey",keywords:["hockey","field","stick"],category:"activities"},
+{emoji:"🥍",name:"lacrosse",keywords:["lacrosse","stick","ball"],category:"activities"},
+{emoji:"🏏",name:"cricket game",keywords:["cricket","bat","ball"],category:"activities"},
+{emoji:"🥅",name:"goal net",keywords:["goal","net","score"],category:"activities"},
+{emoji:"⛳",name:"flag in hole",keywords:["golf","flag","hole"],category:"activities"},
+{emoji:"🏹",name:"bow and arrow",keywords:["archery","bow","arrow"],category:"activities"},
+{emoji:"🎣",name:"fishing pole",keywords:["fishing","pole","fish"],category:"activities"},
+{emoji:"🤿",name:"diving mask",keywords:["diving","snorkel","swim"],category:"activities"},
+{emoji:"🥊",name:"boxing glove",keywords:["boxing","glove","fight"],category:"activities"},
+{emoji:"🥋",name:"martial arts uniform",keywords:["karate","judo","martial arts"],category:"activities"},
+{emoji:"🎽",name:"running shirt",keywords:["running","shirt","athletics"],category:"activities"},
+{emoji:"🛹",name:"skateboard",keywords:["skateboard","skate","board"],category:"activities"},
+{emoji:"🛼",name:"roller skate",keywords:["roller","skate","retro"],category:"activities"},
+{emoji:"🛷",name:"sled",keywords:["sled","snow","winter"],category:"activities"},
+{emoji:"⛸️",name:"ice skate",keywords:["ice","skate","winter"],category:"activities"},
+{emoji:"🥌",name:"curling stone",keywords:["curling","stone","winter"],category:"activities"},
+{emoji:"🎿",name:"skis",keywords:["ski","snow","winter","sport"],category:"activities"},
+{emoji:"🏂",name:"snowboarder",keywords:["snowboard","snow","winter"],category:"activities"},
+{emoji:"🏋️",name:"person lifting weights",keywords:["weightlifting","gym","exercise"],category:"activities"},
+{emoji:"🤼",name:"people wrestling",keywords:["wrestling","fight","sport"],category:"activities"},
+{emoji:"🤸",name:"person cartwheeling",keywords:["cartwheel","gymnastics","flexible"],category:"activities"},
+{emoji:"🤺",name:"person fencing",keywords:["fencing","sword","sport"],category:"activities"},
+{emoji:"⛹️",name:"person bouncing ball",keywords:["basketball","dribble","sport"],category:"activities"},
+{emoji:"🏊",name:"person swimming",keywords:["swim","pool","sport"],category:"activities"},
+{emoji:"🚣",name:"person rowing boat",keywords:["row","boat","canoe"],category:"activities"},
+{emoji:"🧗",name:"person climbing",keywords:["climb","rock","sport"],category:"activities"},
+{emoji:"🚵",name:"person mountain biking",keywords:["bike","mountain","cycling"],category:"activities"},
+{emoji:"🚴",name:"person biking",keywords:["bike","cycling","bicycle"],category:"activities"},
+{emoji:"🏇",name:"horse racing",keywords:["horse","racing","jockey"],category:"activities"},
+{emoji:"🏆",name:"trophy",keywords:["trophy","winner","award","gold"],category:"activities"},
+{emoji:"🥇",name:"1st place medal",keywords:["gold","medal","first","winner"],category:"activities"},
+{emoji:"🥈",name:"2nd place medal",keywords:["silver","medal","second"],category:"activities"},
+{emoji:"🥉",name:"3rd place medal",keywords:["bronze","medal","third"],category:"activities"},
+{emoji:"🏅",name:"sports medal",keywords:["medal","sports","achievement"],category:"activities"},
+{emoji:"🎖️",name:"military medal",keywords:["medal","military","honor"],category:"activities"},
+{emoji:"🎪",name:"circus tent",keywords:["circus","tent","carnival"],category:"activities"},
+{emoji:"🤹",name:"person juggling",keywords:["juggle","circus","skill"],category:"activities"},
+{emoji:"🎭",name:"performing arts",keywords:["theater","drama","masks"],category:"activities"},
+{emoji:"🎨",name:"artist palette",keywords:["art","paint","palette","creative"],category:"activities"},
+{emoji:"🎬",name:"clapper board",keywords:["movie","film","cinema","action"],category:"activities"},
+{emoji:"🎤",name:"microphone",keywords:["mic","karaoke","sing","music"],category:"activities"},
+{emoji:"🎧",name:"headphone",keywords:["headphones","music","audio"],category:"activities"},
+{emoji:"🎼",name:"musical score",keywords:["music","score","notes"],category:"activities"},
+{emoji:"🎹",name:"musical keyboard",keywords:["piano","keyboard","music"],category:"activities"},
+{emoji:"🥁",name:"drum",keywords:["drum","music","beat"],category:"activities"},
+{emoji:"🎷",name:"saxophone",keywords:["sax","saxophone","music","jazz"],category:"activities"},
+{emoji:"🎺",name:"trumpet",keywords:["trumpet","music","horn","brass"],category:"activities"},
+{emoji:"🎸",name:"guitar",keywords:["guitar","music","rock"],category:"activities"},
+{emoji:"🪕",name:"banjo",keywords:["banjo","music","country"],category:"activities"},
+{emoji:"🎻",name:"violin",keywords:["violin","music","classical"],category:"activities"},
+{emoji:"🎲",name:"game die",keywords:["dice","game","roll","random"],category:"activities"},
+{emoji:"♟️",name:"chess pawn",keywords:["chess","pawn","game","strategy"],category:"activities"},
+{emoji:"🎯",name:"direct hit",keywords:["target","bullseye","dart"],category:"activities"},
+{emoji:"🎳",name:"bowling",keywords:["bowling","ball","pins"],category:"activities"},
+{emoji:"🎮",name:"video game",keywords:["game","controller","gaming","play"],category:"activities"},
+{emoji:"🕹️",name:"joystick",keywords:["joystick","game","arcade"],category:"activities"},
+{emoji:"🎰",name:"slot machine",keywords:["slot","casino","gambling"],category:"activities"},
+{emoji:"🧩",name:"puzzle piece",keywords:["puzzle","piece","jigsaw"],category:"activities"},
+// travel
+{emoji:"🚗",name:"automobile",keywords:["car","vehicle","drive","red"],category:"travel"},
+{emoji:"🚕",name:"taxi",keywords:["taxi","cab","car","yellow"],category:"travel"},
+{emoji:"🚙",name:"sport utility vehicle",keywords:["car","suv","vehicle"],category:"travel"},
+{emoji:"🚌",name:"bus",keywords:["bus","vehicle","transit"],category:"travel"},
+{emoji:"🚎",name:"trolleybus",keywords:["trolley","bus","electric"],category:"travel"},
+{emoji:"🏎️",name:"racing car",keywords:["race","car","fast","formula"],category:"travel"},
+{emoji:"🚓",name:"police car",keywords:["police","car","cop"],category:"travel"},
+{emoji:"🚑",name:"ambulance",keywords:["ambulance","emergency","hospital"],category:"travel"},
+{emoji:"🚒",name:"fire engine",keywords:["fire","truck","engine","emergency"],category:"travel"},
+{emoji:"🚐",name:"minibus",keywords:["minibus","van","vehicle"],category:"travel"},
+{emoji:"🛻",name:"pickup truck",keywords:["truck","pickup","vehicle"],category:"travel"},
+{emoji:"🚚",name:"delivery truck",keywords:["truck","delivery","moving"],category:"travel"},
+{emoji:"🚛",name:"articulated lorry",keywords:["truck","semi","lorry"],category:"travel"},
+{emoji:"🚜",name:"tractor",keywords:["tractor","farm","vehicle"],category:"travel"},
+{emoji:"🏍️",name:"motorcycle",keywords:["motorcycle","bike","racing"],category:"travel"},
+{emoji:"🛵",name:"motor scooter",keywords:["scooter","vespa","moped"],category:"travel"},
+{emoji:"🚲",name:"bicycle",keywords:["bike","bicycle","cycling"],category:"travel"},
+{emoji:"🛴",name:"kick scooter",keywords:["scooter","kick","ride"],category:"travel"},
+{emoji:"🚏",name:"bus stop",keywords:["bus","stop","transit"],category:"travel"},
+{emoji:"🛣️",name:"motorway",keywords:["road","highway","motorway"],category:"travel"},
+{emoji:"🛤️",name:"railway track",keywords:["rail","track","train"],category:"travel"},
+{emoji:"⛽",name:"fuel pump",keywords:["gas","fuel","petrol","station"],category:"travel"},
+{emoji:"🚨",name:"police car light",keywords:["police","siren","emergency","light"],category:"travel"},
+{emoji:"🚥",name:"horizontal traffic light",keywords:["traffic","light","signal"],category:"travel"},
+{emoji:"🚦",name:"vertical traffic light",keywords:["traffic","light","signal"],category:"travel"},
+{emoji:"🛑",name:"stop sign",keywords:["stop","sign","red"],category:"travel"},
+{emoji:"🚧",name:"construction",keywords:["construction","barrier","warning"],category:"travel"},
+{emoji:"⚓",name:"anchor",keywords:["anchor","ship","boat","sea"],category:"travel"},
+{emoji:"⛵",name:"sailboat",keywords:["sail","boat","ship","sea"],category:"travel"},
+{emoji:"🚤",name:"speedboat",keywords:["speedboat","fast","boat"],category:"travel"},
+{emoji:"🛳️",name:"passenger ship",keywords:["cruise","ship","boat"],category:"travel"},
+{emoji:"🚢",name:"ship",keywords:["ship","boat","ocean"],category:"travel"},
+{emoji:"✈️",name:"airplane",keywords:["airplane","plane","fly","travel"],category:"travel"},
+{emoji:"🛩️",name:"small airplane",keywords:["airplane","small","plane"],category:"travel"},
+{emoji:"🛫",name:"airplane departure",keywords:["airplane","departure","takeoff"],category:"travel"},
+{emoji:"🛬",name:"airplane arrival",keywords:["airplane","arrival","landing"],category:"travel"},
+{emoji:"🪂",name:"parachute",keywords:["parachute","skydive","fall"],category:"travel"},
+{emoji:"💺",name:"seat",keywords:["seat","chair","airplane"],category:"travel"},
+{emoji:"🚁",name:"helicopter",keywords:["helicopter","fly","chopper"],category:"travel"},
+{emoji:"🚀",name:"rocket",keywords:["rocket","space","launch","fast"],category:"travel"},
+{emoji:"🛸",name:"flying saucer",keywords:["ufo","alien","spaceship"],category:"travel"},
+{emoji:"🏠",name:"house",keywords:["house","home","building"],category:"travel"},
+{emoji:"🏡",name:"house with garden",keywords:["house","home","garden"],category:"travel"},
+{emoji:"🏗️",name:"building construction",keywords:["construction","building","crane"],category:"travel"},
+{emoji:"🏭",name:"factory",keywords:["factory","industry","building"],category:"travel"},
+{emoji:"🏢",name:"office building",keywords:["office","building","work"],category:"travel"},
+{emoji:"🏬",name:"department store",keywords:["store","shopping","mall"],category:"travel"},
+{emoji:"🏥",name:"hospital",keywords:["hospital","medical","health"],category:"travel"},
+{emoji:"🏦",name:"bank",keywords:["bank","money","building"],category:"travel"},
+{emoji:"🏨",name:"hotel",keywords:["hotel","building","travel"],category:"travel"},
+{emoji:"🏩",name:"love hotel",keywords:["hotel","love","heart"],category:"travel"},
+{emoji:"💒",name:"wedding",keywords:["wedding","church","marriage"],category:"travel"},
+{emoji:"🏛️",name:"classical building",keywords:["building","classical","museum"],category:"travel"},
+{emoji:"⛪",name:"church",keywords:["church","religion","building"],category:"travel"},
+{emoji:"🕌",name:"mosque",keywords:["mosque","islam","religion"],category:"travel"},
+{emoji:"🕍",name:"synagogue",keywords:["synagogue","jewish","religion"],category:"travel"},
+{emoji:"🗼",name:"Tokyo tower",keywords:["tokyo","tower","japan"],category:"travel"},
+{emoji:"🗽",name:"Statue of Liberty",keywords:["statue","liberty","new york","america"],category:"travel"},
+{emoji:"🗿",name:"moai",keywords:["moai","easter island","stone"],category:"travel"},
+{emoji:"🏔️",name:"snow-capped mountain",keywords:["mountain","snow","nature"],category:"travel"},
+{emoji:"⛰️",name:"mountain",keywords:["mountain","nature","hiking"],category:"travel"},
+{emoji:"🌋",name:"volcano",keywords:["volcano","eruption","lava"],category:"travel"},
+{emoji:"🏕️",name:"camping",keywords:["camping","tent","nature"],category:"travel"},
+{emoji:"🏖️",name:"beach with umbrella",keywords:["beach","umbrella","vacation"],category:"travel"},
+{emoji:"🏜️",name:"desert",keywords:["desert","sand","hot"],category:"travel"},
+{emoji:"🏝️",name:"desert island",keywords:["island","tropical","palm"],category:"travel"},
+{emoji:"🌅",name:"sunrise",keywords:["sunrise","morning","sun"],category:"travel"},
+{emoji:"🌄",name:"sunrise over mountains",keywords:["sunrise","mountain","morning"],category:"travel"},
+{emoji:"🌠",name:"shooting star",keywords:["star","shooting","wish","night"],category:"travel"},
+{emoji:"🎇",name:"sparkler",keywords:["sparkler","firework","celebration"],category:"travel"},
+{emoji:"🎆",name:"fireworks",keywords:["fireworks","celebration","night"],category:"travel"},
+{emoji:"🌇",name:"sunset",keywords:["sunset","city","evening"],category:"travel"},
+{emoji:"🌆",name:"cityscape at dusk",keywords:["city","dusk","evening"],category:"travel"},
+{emoji:"🌃",name:"night with stars",keywords:["night","city","stars"],category:"travel"},
+{emoji:"🌉",name:"bridge at night",keywords:["bridge","night","city"],category:"travel"},
+{emoji:"🌌",name:"milky way",keywords:["milky way","galaxy","space","stars"],category:"travel"},
+{emoji:"☀️",name:"sun",keywords:["sun","sunny","hot","weather"],category:"travel"},
+{emoji:"🌙",name:"crescent moon",keywords:["moon","crescent","night"],category:"travel"},
+{emoji:"⭐",name:"star",keywords:["star","yellow","night"],category:"travel"},
+{emoji:"🌟",name:"glowing star",keywords:["star","glow","sparkle"],category:"travel"},
+{emoji:"💫",name:"dizzy",keywords:["star","dizzy","sparkle"],category:"travel"},
+{emoji:"✨",name:"sparkles",keywords:["sparkle","shine","glitter","magic"],category:"travel"},
+{emoji:"☁️",name:"cloud",keywords:["cloud","weather","sky"],category:"travel"},
+{emoji:"⛅",name:"sun behind cloud",keywords:["cloud","sun","weather","partly cloudy"],category:"travel"},
+{emoji:"🌤️",name:"sun behind small cloud",keywords:["sun","cloud","weather"],category:"travel"},
+{emoji:"🌧️",name:"cloud with rain",keywords:["rain","cloud","weather"],category:"travel"},
+{emoji:"🌨️",name:"cloud with snow",keywords:["snow","cloud","weather","winter"],category:"travel"},
+{emoji:"🌩️",name:"cloud with lightning",keywords:["lightning","thunder","storm"],category:"travel"},
+{emoji:"🌪️",name:"tornado",keywords:["tornado","twister","storm"],category:"travel"},
+{emoji:"🌈",name:"rainbow",keywords:["rainbow","colorful","weather"],category:"travel"},
+{emoji:"☔",name:"umbrella with rain drops",keywords:["umbrella","rain","weather"],category:"travel"},
+{emoji:"❄️",name:"snowflake",keywords:["snow","snowflake","cold","winter"],category:"travel"},
+{emoji:"☃️",name:"snowman",keywords:["snowman","snow","winter"],category:"travel"},
+{emoji:"⛄",name:"snowman without snow",keywords:["snowman","winter"],category:"travel"},
+{emoji:"🔥",name:"fire",keywords:["fire","flame","hot","lit"],category:"travel"},
+{emoji:"💧",name:"droplet",keywords:["water","drop","rain"],category:"travel"},
+{emoji:"🌊",name:"water wave",keywords:["wave","ocean","sea","surf"],category:"travel"},
+// objects
+{emoji:"💡",name:"light bulb",keywords:["idea","light","bulb","bright"],category:"objects"},
+{emoji:"🔦",name:"flashlight",keywords:["flashlight","light","torch"],category:"objects"},
+{emoji:"🕯️",name:"candle",keywords:["candle","light","flame"],category:"objects"},
+{emoji:"💻",name:"laptop",keywords:["laptop","computer","macbook","code"],category:"objects"},
+{emoji:"🖥️",name:"desktop computer",keywords:["computer","desktop","monitor","screen"],category:"objects"},
+{emoji:"🖨️",name:"printer",keywords:["printer","print","paper"],category:"objects"},
+{emoji:"⌨️",name:"keyboard",keywords:["keyboard","type","computer"],category:"objects"},
+{emoji:"🖱️",name:"computer mouse",keywords:["mouse","click","computer"],category:"objects"},
+{emoji:"💾",name:"floppy disk",keywords:["floppy","disk","save","retro"],category:"objects"},
+{emoji:"💿",name:"optical disk",keywords:["cd","disk","disc"],category:"objects"},
+{emoji:"📀",name:"dvd",keywords:["dvd","disk","disc","movie"],category:"objects"},
+{emoji:"🔌",name:"electric plug",keywords:["plug","electric","power","charge"],category:"objects"},
+{emoji:"🔋",name:"battery",keywords:["battery","power","charge"],category:"objects"},
+{emoji:"📱",name:"mobile phone",keywords:["phone","mobile","cell","iphone"],category:"objects"},
+{emoji:"📲",name:"mobile phone with arrow",keywords:["phone","call","incoming"],category:"objects"},
+{emoji:"☎️",name:"telephone",keywords:["phone","telephone","call"],category:"objects"},
+{emoji:"📞",name:"telephone receiver",keywords:["phone","call","receiver"],category:"objects"},
+{emoji:"📺",name:"television",keywords:["tv","television","screen","watch"],category:"objects"},
+{emoji:"📻",name:"radio",keywords:["radio","music","broadcast"],category:"objects"},
+{emoji:"🎙️",name:"studio microphone",keywords:["microphone","studio","podcast"],category:"objects"},
+{emoji:"⏰",name:"alarm clock",keywords:["alarm","clock","time","wake"],category:"objects"},
+{emoji:"🕰️",name:"mantelpiece clock",keywords:["clock","time","antique"],category:"objects"},
+{emoji:"⏱️",name:"stopwatch",keywords:["stopwatch","time","timer"],category:"objects"},
+{emoji:"⏲️",name:"timer clock",keywords:["timer","clock","kitchen"],category:"objects"},
+{emoji:"📡",name:"satellite antenna",keywords:["satellite","antenna","signal"],category:"objects"},
+{emoji:"🔭",name:"telescope",keywords:["telescope","space","astronomy","look"],category:"objects"},
+{emoji:"🔬",name:"microscope",keywords:["microscope","science","lab"],category:"objects"},
+{emoji:"🩺",name:"stethoscope",keywords:["stethoscope","doctor","medical"],category:"objects"},
+{emoji:"🩹",name:"adhesive bandage",keywords:["bandage","bandaid","wound"],category:"objects"},
+{emoji:"💊",name:"pill",keywords:["pill","medicine","drug"],category:"objects"},
+{emoji:"💉",name:"syringe",keywords:["syringe","needle","vaccine","shot"],category:"objects"},
+{emoji:"🧬",name:"dna",keywords:["dna","gene","genetics","science"],category:"objects"},
+{emoji:"🧪",name:"test tube",keywords:["test tube","science","lab","chemistry"],category:"objects"},
+{emoji:"🌡️",name:"thermometer",keywords:["thermometer","temperature","weather"],category:"objects"},
+{emoji:"🔑",name:"key",keywords:["key","lock","password","access"],category:"objects"},
+{emoji:"🗝️",name:"old key",keywords:["key","old","antique","lock"],category:"objects"},
+{emoji:"🔒",name:"locked",keywords:["lock","secure","padlock","closed"],category:"objects"},
+{emoji:"🔓",name:"unlocked",keywords:["unlock","open","padlock"],category:"objects"},
+{emoji:"🔨",name:"hammer",keywords:["hammer","tool","build","nail"],category:"objects"},
+{emoji:"🪓",name:"axe",keywords:["axe","chop","wood","tool"],category:"objects"},
+{emoji:"⛏️",name:"pick",keywords:["pick","mine","tool"],category:"objects"},
+{emoji:"🛠️",name:"hammer and wrench",keywords:["tools","build","fix","repair"],category:"objects"},
+{emoji:"🔧",name:"wrench",keywords:["wrench","tool","fix","repair"],category:"objects"},
+{emoji:"🔩",name:"nut and bolt",keywords:["nut","bolt","hardware","screw"],category:"objects"},
+{emoji:"⚙️",name:"gear",keywords:["gear","settings","cog","mechanical"],category:"objects"},
+{emoji:"🧱",name:"brick",keywords:["brick","wall","build"],category:"objects"},
+{emoji:"🧲",name:"magnet",keywords:["magnet","attract","magnetic"],category:"objects"},
+{emoji:"💈",name:"barber pole",keywords:["barber","haircut","pole"],category:"objects"},
+{emoji:"🎁",name:"wrapped gift",keywords:["gift","present","birthday","christmas"],category:"objects"},
+{emoji:"🎀",name:"ribbon",keywords:["ribbon","bow","gift","decoration"],category:"objects"},
+{emoji:"🎊",name:"confetti ball",keywords:["confetti","celebration","party"],category:"objects"},
+{emoji:"🎉",name:"party popper",keywords:["party","celebrate","tada","confetti"],category:"objects"},
+{emoji:"🎈",name:"balloon",keywords:["balloon","party","birthday","celebration"],category:"objects"},
+{emoji:"🏮",name:"red paper lantern",keywords:["lantern","red","japanese","chinese"],category:"objects"},
+{emoji:"📧",name:"e-mail",keywords:["email","mail","message"],category:"objects"},
+{emoji:"📨",name:"incoming envelope",keywords:["email","envelope","incoming"],category:"objects"},
+{emoji:"📩",name:"envelope with arrow",keywords:["email","send","envelope"],category:"objects"},
+{emoji:"📦",name:"package",keywords:["package","box","delivery","shipping"],category:"objects"},
+{emoji:"📜",name:"scroll",keywords:["scroll","paper","document","ancient"],category:"objects"},
+{emoji:"📃",name:"page with curl",keywords:["page","document","paper"],category:"objects"},
+{emoji:"📄",name:"page facing up",keywords:["page","document","paper","file"],category:"objects"},
+{emoji:"📊",name:"bar chart",keywords:["chart","bar","graph","data"],category:"objects"},
+{emoji:"📈",name:"chart increasing",keywords:["chart","graph","up","growth"],category:"objects"},
+{emoji:"📉",name:"chart decreasing",keywords:["chart","graph","down","decline"],category:"objects"},
+{emoji:"📋",name:"clipboard",keywords:["clipboard","list","paste"],category:"objects"},
+{emoji:"📁",name:"file folder",keywords:["folder","file","directory"],category:"objects"},
+{emoji:"📂",name:"open file folder",keywords:["folder","open","file"],category:"objects"},
+{emoji:"📅",name:"calendar",keywords:["calendar","date","schedule"],category:"objects"},
+{emoji:"📆",name:"tear-off calendar",keywords:["calendar","date","schedule"],category:"objects"},
+{emoji:"✏️",name:"pencil",keywords:["pencil","write","draw","edit"],category:"objects"},
+{emoji:"✒️",name:"black nib",keywords:["pen","nib","write"],category:"objects"},
+{emoji:"🖋️",name:"fountain pen",keywords:["pen","fountain","write"],category:"objects"},
+{emoji:"🖊️",name:"pen",keywords:["pen","write","ballpoint"],category:"objects"},
+{emoji:"🖌️",name:"paintbrush",keywords:["paintbrush","art","paint"],category:"objects"},
+{emoji:"🖍️",name:"crayon",keywords:["crayon","draw","color"],category:"objects"},
+{emoji:"📝",name:"memo",keywords:["memo","note","write","pencil"],category:"objects"},
+{emoji:"🔍",name:"magnifying glass tilted left",keywords:["search","magnify","find","zoom"],category:"objects"},
+{emoji:"🔎",name:"magnifying glass tilted right",keywords:["search","magnify","find","zoom"],category:"objects"},
+{emoji:"📌",name:"pushpin",keywords:["pin","pushpin","location"],category:"objects"},
+{emoji:"📎",name:"paperclip",keywords:["paperclip","attachment","clip"],category:"objects"},
+{emoji:"✂️",name:"scissors",keywords:["scissors","cut","snip"],category:"objects"},
+{emoji:"📐",name:"triangular ruler",keywords:["ruler","triangle","math"],category:"objects"},
+{emoji:"📏",name:"straight ruler",keywords:["ruler","measure","straight"],category:"objects"},
+{emoji:"🗑️",name:"wastebasket",keywords:["trash","delete","bin","garbage"],category:"objects"},
+{emoji:"📚",name:"books",keywords:["books","read","library","study"],category:"objects"},
+{emoji:"📖",name:"open book",keywords:["book","open","read","study"],category:"objects"},
+{emoji:"📰",name:"newspaper",keywords:["newspaper","news","press"],category:"objects"},
+{emoji:"🏷️",name:"label",keywords:["label","tag","price"],category:"objects"},
+{emoji:"💰",name:"money bag",keywords:["money","bag","dollar","rich"],category:"objects"},
+{emoji:"💵",name:"dollar banknote",keywords:["money","dollar","bill","cash"],category:"objects"},
+{emoji:"💳",name:"credit card",keywords:["credit","card","payment","bank"],category:"objects"},
+{emoji:"💎",name:"gem stone",keywords:["gem","diamond","jewel","precious"],category:"objects"},
+{emoji:"🧸",name:"teddy bear",keywords:["teddy","bear","toy","stuffed"],category:"objects"},
+{emoji:"🪞",name:"mirror",keywords:["mirror","reflection","vanity"],category:"objects"},
+{emoji:"🪑",name:"chair",keywords:["chair","seat","sit"],category:"objects"},
+{emoji:"🛏️",name:"bed",keywords:["bed","sleep","bedroom"],category:"objects"},
+{emoji:"🛋️",name:"couch and lamp",keywords:["couch","sofa","lamp","furniture"],category:"objects"},
+{emoji:"🚿",name:"shower",keywords:["shower","bath","water"],category:"objects"},
+{emoji:"🛁",name:"bathtub",keywords:["bathtub","bath","clean"],category:"objects"},
+{emoji:"🪥",name:"toothbrush",keywords:["toothbrush","teeth","clean","dental"],category:"objects"},
+{emoji:"🧴",name:"lotion bottle",keywords:["lotion","cream","bottle"],category:"objects"},
+{emoji:"🧹",name:"broom",keywords:["broom","sweep","clean"],category:"objects"},
+{emoji:"🧺",name:"basket",keywords:["basket","laundry","picnic"],category:"objects"},
+{emoji:"🧻",name:"roll of paper",keywords:["toilet paper","roll","tissue"],category:"objects"},
+{emoji:"🧼",name:"soap",keywords:["soap","clean","wash"],category:"objects"},
+{emoji:"🧽",name:"sponge",keywords:["sponge","clean","absorb"],category:"objects"},
+// symbols
+{emoji:"❤️",name:"red heart",keywords:["heart","love","red","valentine"],category:"symbols"},
+{emoji:"🧡",name:"orange heart",keywords:["heart","love","orange"],category:"symbols"},
+{emoji:"💛",name:"yellow heart",keywords:["heart","love","yellow"],category:"symbols"},
+{emoji:"💚",name:"green heart",keywords:["heart","love","green"],category:"symbols"},
+{emoji:"💙",name:"blue heart",keywords:["heart","love","blue"],category:"symbols"},
+{emoji:"💜",name:"purple heart",keywords:["heart","love","purple"],category:"symbols"},
+{emoji:"🖤",name:"black heart",keywords:["heart","love","black","dark"],category:"symbols"},
+{emoji:"🤍",name:"white heart",keywords:["heart","love","white","pure"],category:"symbols"},
+{emoji:"🤎",name:"brown heart",keywords:["heart","love","brown"],category:"symbols"},
+{emoji:"💔",name:"broken heart",keywords:["heart","broken","sad","breakup"],category:"symbols"},
+{emoji:"❣️",name:"heart exclamation",keywords:["heart","exclamation","love"],category:"symbols"},
+{emoji:"💕",name:"two hearts",keywords:["heart","love","two","pair"],category:"symbols"},
+{emoji:"💞",name:"revolving hearts",keywords:["heart","love","revolving"],category:"symbols"},
+{emoji:"💓",name:"beating heart",keywords:["heart","love","beating","pulse"],category:"symbols"},
+{emoji:"💗",name:"growing heart",keywords:["heart","love","growing"],category:"symbols"},
+{emoji:"💖",name:"sparkling heart",keywords:["heart","love","sparkle"],category:"symbols"},
+{emoji:"💘",name:"heart with arrow",keywords:["heart","love","arrow","cupid"],category:"symbols"},
+{emoji:"💝",name:"heart with ribbon",keywords:["heart","love","ribbon","gift"],category:"symbols"},
+{emoji:"💟",name:"heart decoration",keywords:["heart","love","decoration"],category:"symbols"},
+{emoji:"☮️",name:"peace symbol",keywords:["peace","symbol","hippie"],category:"symbols"},
+{emoji:"✝️",name:"latin cross",keywords:["cross","christian","religion"],category:"symbols"},
+{emoji:"☪️",name:"star and crescent",keywords:["islam","muslim","religion"],category:"symbols"},
+{emoji:"☯️",name:"yin yang",keywords:["yin","yang","balance","tao"],category:"symbols"},
+{emoji:"✡️",name:"star of David",keywords:["star","david","jewish","judaism"],category:"symbols"},
+{emoji:"♈",name:"Aries",keywords:["aries","zodiac","horoscope"],category:"symbols"},
+{emoji:"♉",name:"Taurus",keywords:["taurus","zodiac","horoscope"],category:"symbols"},
+{emoji:"♊",name:"Gemini",keywords:["gemini","zodiac","horoscope"],category:"symbols"},
+{emoji:"♋",name:"Cancer",keywords:["cancer","zodiac","horoscope"],category:"symbols"},
+{emoji:"♌",name:"Leo",keywords:["leo","zodiac","horoscope"],category:"symbols"},
+{emoji:"♍",name:"Virgo",keywords:["virgo","zodiac","horoscope"],category:"symbols"},
+{emoji:"♎",name:"Libra",keywords:["libra","zodiac","horoscope"],category:"symbols"},
+{emoji:"♏",name:"Scorpio",keywords:["scorpio","zodiac","horoscope"],category:"symbols"},
+{emoji:"♐",name:"Sagittarius",keywords:["sagittarius","zodiac","horoscope"],category:"symbols"},
+{emoji:"♑",name:"Capricorn",keywords:["capricorn","zodiac","horoscope"],category:"symbols"},
+{emoji:"♒",name:"Aquarius",keywords:["aquarius","zodiac","horoscope"],category:"symbols"},
+{emoji:"♓",name:"Pisces",keywords:["pisces","zodiac","horoscope"],category:"symbols"},
+{emoji:"⛎",name:"Ophiuchus",keywords:["ophiuchus","zodiac"],category:"symbols"},
+{emoji:"🆔",name:"ID button",keywords:["id","identity","button"],category:"symbols"},
+{emoji:"⚛️",name:"atom symbol",keywords:["atom","science","physics"],category:"symbols"},
+{emoji:"☢️",name:"radioactive",keywords:["radioactive","nuclear","danger"],category:"symbols"},
+{emoji:"☣️",name:"biohazard",keywords:["biohazard","danger","toxic"],category:"symbols"},
+{emoji:"🈶",name:"Japanese here button",keywords:["japanese","kanji"],category:"symbols"},
+{emoji:"🈚",name:"Japanese free button",keywords:["japanese","kanji","free"],category:"symbols"},
+{emoji:"✴️",name:"eight-pointed star",keywords:["star","eight","pointed"],category:"symbols"},
+{emoji:"🆚",name:"VS button",keywords:["vs","versus","against"],category:"symbols"},
+{emoji:"💮",name:"white flower",keywords:["flower","white","japanese"],category:"symbols"},
+{emoji:"🉐",name:"Japanese bargain button",keywords:["japanese","kanji","bargain"],category:"symbols"},
+{emoji:"🈹",name:"Japanese discount button",keywords:["japanese","kanji","discount"],category:"symbols"},
+{emoji:"🅰️",name:"A button blood type",keywords:["a","blood","type"],category:"symbols"},
+{emoji:"🅱️",name:"B button blood type",keywords:["b","blood","type"],category:"symbols"},
+{emoji:"🆎",name:"AB button blood type",keywords:["ab","blood","type"],category:"symbols"},
+{emoji:"🆑",name:"CL button",keywords:["clear","cl","button"],category:"symbols"},
+{emoji:"🅾️",name:"O button blood type",keywords:["o","blood","type"],category:"symbols"},
+{emoji:"🆘",name:"SOS button",keywords:["sos","help","emergency"],category:"symbols"},
+{emoji:"❌",name:"cross mark",keywords:["x","cross","wrong","no","delete"],category:"symbols"},
+{emoji:"⭕",name:"hollow red circle",keywords:["circle","red","hollow","correct"],category:"symbols"},
+{emoji:"🛑",name:"stop sign",keywords:["stop","sign","halt"],category:"symbols"},
+{emoji:"⛔",name:"no entry",keywords:["no","entry","forbidden","prohibited"],category:"symbols"},
+{emoji:"📛",name:"name badge",keywords:["name","badge","tag"],category:"symbols"},
+{emoji:"🚫",name:"prohibited",keywords:["prohibited","forbidden","no","banned"],category:"symbols"},
+{emoji:"💯",name:"hundred points",keywords:["100","hundred","perfect","score"],category:"symbols"},
+{emoji:"💢",name:"anger symbol",keywords:["anger","angry","mad"],category:"symbols"},
+{emoji:"♨️",name:"hot springs",keywords:["hot","springs","steam","onsen"],category:"symbols"},
+{emoji:"🚷",name:"no pedestrians",keywords:["no","pedestrians","walking"],category:"symbols"},
+{emoji:"🚯",name:"no littering",keywords:["no","litter","trash"],category:"symbols"},
+{emoji:"🚱",name:"non-potable water",keywords:["water","non-potable","no drinking"],category:"symbols"},
+{emoji:"🔞",name:"no one under eighteen",keywords:["18","adult","restricted"],category:"symbols"},
+{emoji:"📵",name:"no mobile phones",keywords:["no","phone","mobile"],category:"symbols"},
+{emoji:"❗",name:"exclamation mark",keywords:["exclamation","warning","important"],category:"symbols"},
+{emoji:"❓",name:"question mark",keywords:["question","what","confused"],category:"symbols"},
+{emoji:"‼️",name:"double exclamation mark",keywords:["exclamation","warning","double"],category:"symbols"},
+{emoji:"⁉️",name:"exclamation question mark",keywords:["exclamation","question","surprise"],category:"symbols"},
+{emoji:"⚠️",name:"warning",keywords:["warning","caution","danger"],category:"symbols"},
+{emoji:"🔱",name:"trident emblem",keywords:["trident","anchor","emblem"],category:"symbols"},
+{emoji:"♻️",name:"recycling symbol",keywords:["recycle","green","environment"],category:"symbols"},
+{emoji:"✅",name:"check mark button",keywords:["check","done","complete","yes"],category:"symbols"},
+{emoji:"💠",name:"diamond with a dot",keywords:["diamond","dot","kawaii"],category:"symbols"},
+{emoji:"🌐",name:"globe with meridians",keywords:["globe","earth","web","internet"],category:"symbols"},
+{emoji:"💤",name:"zzz",keywords:["sleep","zzz","tired","snore"],category:"symbols"},
+{emoji:"🏧",name:"ATM sign",keywords:["atm","bank","money"],category:"symbols"},
+{emoji:"♿",name:"wheelchair symbol",keywords:["wheelchair","accessible","disability"],category:"symbols"},
+{emoji:"🅿️",name:"P button",keywords:["parking","p","button"],category:"symbols"},
+{emoji:"ℹ️",name:"information",keywords:["info","information","help"],category:"symbols"},
+{emoji:"🆖",name:"NG button",keywords:["ng","no good","button"],category:"symbols"},
+{emoji:"🆗",name:"OK button",keywords:["ok","button","agree"],category:"symbols"},
+{emoji:"🆙",name:"UP! button",keywords:["up","button","level"],category:"symbols"},
+{emoji:"🆒",name:"COOL button",keywords:["cool","button","nice"],category:"symbols"},
+{emoji:"🆕",name:"NEW button",keywords:["new","button","fresh"],category:"symbols"},
+{emoji:"🆓",name:"FREE button",keywords:["free","button","gratis"],category:"symbols"},
+{emoji:"0️⃣",name:"keycap 0",keywords:["zero","0","number"],category:"symbols"},
+{emoji:"1️⃣",name:"keycap 1",keywords:["one","1","number"],category:"symbols"},
+{emoji:"2️⃣",name:"keycap 2",keywords:["two","2","number"],category:"symbols"},
+{emoji:"3️⃣",name:"keycap 3",keywords:["three","3","number"],category:"symbols"},
+{emoji:"4️⃣",name:"keycap 4",keywords:["four","4","number"],category:"symbols"},
+{emoji:"5️⃣",name:"keycap 5",keywords:["five","5","number"],category:"symbols"},
+{emoji:"6️⃣",name:"keycap 6",keywords:["six","6","number"],category:"symbols"},
+{emoji:"7️⃣",name:"keycap 7",keywords:["seven","7","number"],category:"symbols"},
+{emoji:"8️⃣",name:"keycap 8",keywords:["eight","8","number"],category:"symbols"},
+{emoji:"9️⃣",name:"keycap 9",keywords:["nine","9","number"],category:"symbols"},
+{emoji:"🔟",name:"keycap 10",keywords:["ten","10","number"],category:"symbols"},
+{emoji:"#️⃣",name:"keycap hash",keywords:["hash","number","pound"],category:"symbols"},
+{emoji:"*️⃣",name:"keycap asterisk",keywords:["asterisk","star","keycap"],category:"symbols"},
+{emoji:"▶️",name:"play button",keywords:["play","button","start"],category:"symbols"},
+{emoji:"⏸️",name:"pause button",keywords:["pause","button","stop"],category:"symbols"},
+{emoji:"⏹️",name:"stop button",keywords:["stop","button","square"],category:"symbols"},
+{emoji:"⏺️",name:"record button",keywords:["record","button","circle"],category:"symbols"},
+{emoji:"⏭️",name:"next track button",keywords:["next","track","skip","forward"],category:"symbols"},
+{emoji:"⏮️",name:"last track button",keywords:["previous","track","back","rewind"],category:"symbols"},
+{emoji:"⏩",name:"fast-forward button",keywords:["fast forward","speed","skip"],category:"symbols"},
+{emoji:"⏪",name:"fast reverse button",keywords:["rewind","back","reverse"],category:"symbols"},
+{emoji:"◀️",name:"reverse button",keywords:["reverse","back","left"],category:"symbols"},
+{emoji:"🔼",name:"upward button",keywords:["up","triangle","button"],category:"symbols"},
+{emoji:"🔽",name:"downward button",keywords:["down","triangle","button"],category:"symbols"},
+{emoji:"➡️",name:"right arrow",keywords:["right","arrow","direction"],category:"symbols"},
+{emoji:"⬅️",name:"left arrow",keywords:["left","arrow","direction"],category:"symbols"},
+{emoji:"⬆️",name:"up arrow",keywords:["up","arrow","direction"],category:"symbols"},
+{emoji:"⬇️",name:"down arrow",keywords:["down","arrow","direction"],category:"symbols"},
+{emoji:"↗️",name:"up-right arrow",keywords:["arrow","up right","diagonal"],category:"symbols"},
+{emoji:"↘️",name:"down-right arrow",keywords:["arrow","down right","diagonal"],category:"symbols"},
+{emoji:"↙️",name:"down-left arrow",keywords:["arrow","down left","diagonal"],category:"symbols"},
+{emoji:"↖️",name:"up-left arrow",keywords:["arrow","up left","diagonal"],category:"symbols"},
+{emoji:"↕️",name:"up-down arrow",keywords:["arrow","up down","vertical"],category:"symbols"},
+{emoji:"↔️",name:"left-right arrow",keywords:["arrow","left right","horizontal"],category:"symbols"},
+{emoji:"↩️",name:"right arrow curving left",keywords:["arrow","back","return","undo"],category:"symbols"},
+{emoji:"↪️",name:"left arrow curving right",keywords:["arrow","forward","redo"],category:"symbols"},
+{emoji:"🔀",name:"shuffle tracks button",keywords:["shuffle","random","mix"],category:"symbols"},
+{emoji:"🔁",name:"repeat button",keywords:["repeat","loop","cycle"],category:"symbols"},
+{emoji:"🔂",name:"repeat single button",keywords:["repeat","one","single"],category:"symbols"},
+{emoji:"🔄",name:"counterclockwise arrows button",keywords:["refresh","reload","sync"],category:"symbols"},
+{emoji:"🎵",name:"musical note",keywords:["music","note","melody"],category:"symbols"},
+{emoji:"🎶",name:"musical notes",keywords:["music","notes","melody","song"],category:"symbols"},
+{emoji:"➕",name:"plus",keywords:["plus","add","positive"],category:"symbols"},
+{emoji:"➖",name:"minus",keywords:["minus","subtract","negative"],category:"symbols"},
+{emoji:"➗",name:"divide",keywords:["divide","division","math"],category:"symbols"},
+{emoji:"✖️",name:"multiply",keywords:["multiply","times","math"],category:"symbols"},
+{emoji:"♾️",name:"infinity",keywords:["infinity","forever","unlimited"],category:"symbols"},
+{emoji:"💲",name:"heavy dollar sign",keywords:["dollar","money","currency"],category:"symbols"},
+{emoji:"™️",name:"trade mark",keywords:["trademark","tm","brand"],category:"symbols"},
+{emoji:"©️",name:"copyright",keywords:["copyright","ip","legal"],category:"symbols"},
+{emoji:"®️",name:"registered",keywords:["registered","trademark","brand"],category:"symbols"},
+{emoji:"✔️",name:"check mark",keywords:["check","done","correct","yes"],category:"symbols"},
+{emoji:"☑️",name:"check box with check",keywords:["check","box","done","ballot"],category:"symbols"},
+{emoji:"🔘",name:"radio button",keywords:["radio","button","option"],category:"symbols"},
+{emoji:"🔴",name:"red circle",keywords:["red","circle","dot"],category:"symbols"},
+{emoji:"🟠",name:"orange circle",keywords:["orange","circle","dot"],category:"symbols"},
+{emoji:"🟡",name:"yellow circle",keywords:["yellow","circle","dot"],category:"symbols"},
+{emoji:"🟢",name:"green circle",keywords:["green","circle","dot"],category:"symbols"},
+{emoji:"🔵",name:"blue circle",keywords:["blue","circle","dot"],category:"symbols"},
+{emoji:"🟣",name:"purple circle",keywords:["purple","circle","dot"],category:"symbols"},
+{emoji:"⚫",name:"black circle",keywords:["black","circle","dot"],category:"symbols"},
+{emoji:"⚪",name:"white circle",keywords:["white","circle","dot"],category:"symbols"},
+{emoji:"🟤",name:"brown circle",keywords:["brown","circle","dot"],category:"symbols"},
+{emoji:"🔺",name:"red triangle pointed up",keywords:["triangle","red","up"],category:"symbols"},
+{emoji:"🔻",name:"red triangle pointed down",keywords:["triangle","red","down"],category:"symbols"},
+{emoji:"🔸",name:"small orange diamond",keywords:["diamond","orange","small"],category:"symbols"},
+{emoji:"🔹",name:"small blue diamond",keywords:["diamond","blue","small"],category:"symbols"},
+{emoji:"🔶",name:"large orange diamond",keywords:["diamond","orange","large"],category:"symbols"},
+{emoji:"🔷",name:"large blue diamond",keywords:["diamond","blue","large"],category:"symbols"},
+{emoji:"🔳",name:"white square button",keywords:["square","white","button"],category:"symbols"},
+{emoji:"🔲",name:"black square button",keywords:["square","black","button"],category:"symbols"},
+{emoji:"▪️",name:"black small square",keywords:["square","black","small"],category:"symbols"},
+{emoji:"▫️",name:"white small square",keywords:["square","white","small"],category:"symbols"},
+{emoji:"◾",name:"black medium-small square",keywords:["square","black","medium"],category:"symbols"},
+{emoji:"◽",name:"white medium-small square",keywords:["square","white","medium"],category:"symbols"},
+{emoji:"🟥",name:"red square",keywords:["square","red"],category:"symbols"},
+{emoji:"🟧",name:"orange square",keywords:["square","orange"],category:"symbols"},
+{emoji:"🟨",name:"yellow square",keywords:["square","yellow"],category:"symbols"},
+{emoji:"🟩",name:"green square",keywords:["square","green"],category:"symbols"},
+{emoji:"🟦",name:"blue square",keywords:["square","blue"],category:"symbols"},
+{emoji:"🟪",name:"purple square",keywords:["square","purple"],category:"symbols"},
+{emoji:"⬛",name:"black large square",keywords:["square","black","large"],category:"symbols"},
+{emoji:"⬜",name:"white large square",keywords:["square","white","large"],category:"symbols"},
+{emoji:"🟫",name:"brown square",keywords:["square","brown"],category:"symbols"},
+{emoji:"💬",name:"speech balloon",keywords:["speech","balloon","chat","talk","comment"],category:"symbols"},
+{emoji:"💭",name:"thought balloon",keywords:["thought","think","balloon","cloud"],category:"symbols"},
+{emoji:"🗯️",name:"right anger bubble",keywords:["anger","speech","mad"],category:"symbols"},
+{emoji:"🗨️",name:"left speech bubble",keywords:["speech","bubble","talk"],category:"symbols"},
+{emoji:"🔔",name:"bell",keywords:["bell","notification","ring","alert"],category:"symbols"},
+{emoji:"🔕",name:"bell with slash",keywords:["bell","mute","silent","no sound"],category:"symbols"},
+// flags
+{emoji:"🇺🇸",name:"United States",keywords:["us","usa","america","flag","united states"],category:"flags"},
+{emoji:"🇬🇧",name:"United Kingdom",keywords:["uk","britain","england","flag","united kingdom"],category:"flags"},
+{emoji:"🇨🇦",name:"Canada",keywords:["canada","flag","maple"],category:"flags"},
+{emoji:"🇦🇺",name:"Australia",keywords:["australia","flag","aussie"],category:"flags"},
+{emoji:"🇩🇪",name:"Germany",keywords:["germany","flag","deutsch"],category:"flags"},
+{emoji:"🇫🇷",name:"France",keywords:["france","flag","french"],category:"flags"},
+{emoji:"🇮🇹",name:"Italy",keywords:["italy","flag","italian"],category:"flags"},
+{emoji:"🇪🇸",name:"Spain",keywords:["spain","flag","spanish"],category:"flags"},
+{emoji:"🇯🇵",name:"Japan",keywords:["japan","flag","japanese"],category:"flags"},
+{emoji:"🇰🇷",name:"South Korea",keywords:["korea","south korea","flag","korean"],category:"flags"},
+{emoji:"🇨🇳",name:"China",keywords:["china","flag","chinese"],category:"flags"},
+{emoji:"🇮🇳",name:"India",keywords:["india","flag","indian"],category:"flags"},
+{emoji:"🇧🇷",name:"Brazil",keywords:["brazil","flag","brazilian"],category:"flags"},
+{emoji:"🇲🇽",name:"Mexico",keywords:["mexico","flag","mexican"],category:"flags"},
+{emoji:"🇷🇺",name:"Russia",keywords:["russia","flag","russian"],category:"flags"},
+{emoji:"🇿🇦",name:"South Africa",keywords:["south africa","flag"],category:"flags"},
+{emoji:"🇳🇬",name:"Nigeria",keywords:["nigeria","flag"],category:"flags"},
+{emoji:"🇪🇬",name:"Egypt",keywords:["egypt","flag"],category:"flags"},
+{emoji:"🇹🇷",name:"Turkey",keywords:["turkey","flag","turkish"],category:"flags"},
+{emoji:"🇸🇦",name:"Saudi Arabia",keywords:["saudi","arabia","flag"],category:"flags"},
+{emoji:"🇦🇪",name:"United Arab Emirates",keywords:["uae","emirates","flag","dubai"],category:"flags"},
+{emoji:"🇮🇱",name:"Israel",keywords:["israel","flag"],category:"flags"},
+{emoji:"🇵🇰",name:"Pakistan",keywords:["pakistan","flag"],category:"flags"},
+{emoji:"🇧🇩",name:"Bangladesh",keywords:["bangladesh","flag"],category:"flags"},
+{emoji:"🇮🇩",name:"Indonesia",keywords:["indonesia","flag"],category:"flags"},
+{emoji:"🇹🇭",name:"Thailand",keywords:["thailand","flag","thai"],category:"flags"},
+{emoji:"🇻🇳",name:"Vietnam",keywords:["vietnam","flag","vietnamese"],category:"flags"},
+{emoji:"🇵🇭",name:"Philippines",keywords:["philippines","flag","filipino"],category:"flags"},
+{emoji:"🇲🇾",name:"Malaysia",keywords:["malaysia","flag"],category:"flags"},
+{emoji:"🇸🇬",name:"Singapore",keywords:["singapore","flag"],category:"flags"},
+{emoji:"🇳🇿",name:"New Zealand",keywords:["new zealand","flag","kiwi"],category:"flags"},
+{emoji:"🇮🇪",name:"Ireland",keywords:["ireland","flag","irish"],category:"flags"},
+{emoji:"🇳🇱",name:"Netherlands",keywords:["netherlands","holland","flag","dutch"],category:"flags"},
+{emoji:"🇧🇪",name:"Belgium",keywords:["belgium","flag"],category:"flags"},
+{emoji:"🇨🇭",name:"Switzerland",keywords:["switzerland","flag","swiss"],category:"flags"},
+{emoji:"🇦🇹",name:"Austria",keywords:["austria","flag"],category:"flags"},
+{emoji:"🇸🇪",name:"Sweden",keywords:["sweden","flag","swedish"],category:"flags"},
+{emoji:"🇳🇴",name:"Norway",keywords:["norway","flag","norwegian"],category:"flags"},
+{emoji:"🇩🇰",name:"Denmark",keywords:["denmark","flag","danish"],category:"flags"},
+{emoji:"🇫🇮",name:"Finland",keywords:["finland","flag","finnish"],category:"flags"},
+{emoji:"🇵🇱",name:"Poland",keywords:["poland","flag","polish"],category:"flags"},
+{emoji:"🇺🇦",name:"Ukraine",keywords:["ukraine","flag","ukrainian"],category:"flags"},
+{emoji:"🇬🇷",name:"Greece",keywords:["greece","flag","greek"],category:"flags"},
+{emoji:"🇵🇹",name:"Portugal",keywords:["portugal","flag","portuguese"],category:"flags"},
+{emoji:"🇦🇷",name:"Argentina",keywords:["argentina","flag"],category:"flags"},
+{emoji:"🇨🇱",name:"Chile",keywords:["chile","flag"],category:"flags"},
+{emoji:"🇨🇴",name:"Colombia",keywords:["colombia","flag"],category:"flags"},
+{emoji:"🇵🇪",name:"Peru",keywords:["peru","flag"],category:"flags"},
+{emoji:"🇪🇨",name:"Ecuador",keywords:["ecuador","flag"],category:"flags"},
+{emoji:"🇻🇪",name:"Venezuela",keywords:["venezuela","flag"],category:"flags"},
+{emoji:"🏳️",name:"white flag",keywords:["white","flag","surrender"],category:"flags"},
+{emoji:"🏴",name:"black flag",keywords:["black","flag","pirate"],category:"flags"},
+{emoji:"🏁",name:"chequered flag",keywords:["checkered","flag","race","finish"],category:"flags"},
+{emoji:"🏳️‍🌈",name:"rainbow flag",keywords:["rainbow","pride","lgbtq","flag"],category:"flags"},
+{emoji:"🏳️‍⚧️",name:"transgender flag",keywords:["transgender","trans","pride","flag"],category:"flags"},
+];
+
+// Build skin tone capable set
+EMOJIS.forEach(e => { if (e.skinTone) SKIN_CAPABLE.add(e.emoji); });
+
+const CATEGORIES = [
+  {id:"smileys",icon:"😀",label:"Smileys"},
+  {id:"people",icon:"👋",label:"People"},
+  {id:"animals",icon:"🐱",label:"Animals"},
+  {id:"food",icon:"🍕",label:"Food"},
+  {id:"activities",icon:"⚽",label:"Activities"},
+  {id:"travel",icon:"✈️",label:"Travel"},
+  {id:"objects",icon:"💡",label:"Objects"},
+  {id:"symbols",icon:"❤️",label:"Symbols"},
+  {id:"flags",icon:"🏁",label:"Flags"}
+];
+
+let currentCategory = "smileys";
+let multiMode = false;
+let multiEmojis = "";
+let recentlyCopied = JSON.parse(localStorage.getItem("recent_emojis") || "[]");
+let activeSkinPopup = null;
+const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+// Theme
+const themeBtn = document.getElementById("themeBtn");
+function applyTheme(t) {
+  document.documentElement.setAttribute("data-theme", t);
+  themeBtn.textContent = t === "dark" ? "☀️" : "🌙";
+  localStorage.setItem("suite_theme", t);
+}
+const savedTheme = localStorage.getItem("suite_theme") || "light";
+applyTheme(savedTheme);
+themeBtn.addEventListener("click", () => {
+  applyTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
+});
+
+// Category tabs
+const catTabsEl = document.getElementById("catTabs");
+CATEGORIES.forEach(c => {
+  const tab = document.createElement("button");
+  tab.className = "cat-tab" + (c.id === currentCategory ? " active" : "");
+  tab.innerHTML = c.icon + " " + c.label;
+  tab.dataset.cat = c.id;
+  tab.addEventListener("click", () => {
+    currentCategory = c.id;
+    document.querySelectorAll(".cat-tab").forEach(t => t.classList.toggle("active", t.dataset.cat === c.id));
+    document.getElementById("search").value = "";
+    renderGrid();
+  });
+  catTabsEl.appendChild(tab);
+});
+
+// Recent bar
+function renderRecent() {
+  const bar = document.getElementById("recentBar");
+  const container = document.getElementById("recentEmojis");
+  if (recentlyCopied.length === 0) { bar.classList.remove("visible"); return; }
+  bar.classList.add("visible");
+  container.innerHTML = "";
+  recentlyCopied.forEach(em => {
+    const s = document.createElement("span");
+    s.textContent = em;
+    s.addEventListener("click", () => copyEmoji(em));
+    container.appendChild(s);
+  });
+}
+
+function addToRecent(em) {
+  recentlyCopied = recentlyCopied.filter(e => e !== em);
+  recentlyCopied.unshift(em);
+  if (recentlyCopied.length > 20) recentlyCopied = recentlyCopied.slice(0, 20);
+  localStorage.setItem("recent_emojis", JSON.stringify(recentlyCopied));
+  renderRecent();
+}
+
+// Copy
+async function copyEmoji(em, ev) {
+  if (multiMode) {
+    multiEmojis += em;
+    document.getElementById("multiField").textContent = multiEmojis;
+    return;
+  }
+  try { await navigator.clipboard.writeText(em); } catch { /* fallback */ }
+  addToRecent(em);
+  showToast(ev || null, "Copied!");
+}
+
+function showToast(ev, text) {
+  const t = document.createElement("div");
+  t.className = "toast";
+  t.textContent = text;
+  if (ev) {
+    const r = ev.target.getBoundingClientRect();
+    t.style.left = r.left + r.width / 2 - 30 + "px";
+    t.style.top = r.top - 30 + "px";
+  } else {
+    t.style.top = "80px";
+    t.style.left = "50%";
+    t.style.transform = "translateX(-50%)";
+  }
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 1000);
+}
+
+// Skin tones
+function closeSkinPopup() {
+  if (activeSkinPopup) { activeSkinPopup.remove(); activeSkinPopup = null; }
+  document.getElementById("skinOverlay").classList.remove("open");
+  document.getElementById("skinSheet").classList.remove("open");
+}
+
+function showSkinTones(baseEmoji, cell, ev) {
+  closeSkinPopup();
+  if (isMobile) {
+    const sheet = document.getElementById("skinSheet");
+    const opts = document.getElementById("skinSheetOptions");
+    opts.innerHTML = "";
+    SKIN_TONES.forEach(tone => {
+      const s = document.createElement("span");
+      s.textContent = baseEmoji + tone;
+      s.addEventListener("click", (e) => { closeSkinPopup(); copyEmoji(baseEmoji + tone, e); });
+      opts.appendChild(s);
+    });
+    document.getElementById("skinOverlay").classList.add("open");
+    sheet.classList.add("open");
+  } else {
+    const popup = document.createElement("div");
+    popup.className = "skin-popup";
+    SKIN_TONES.forEach(tone => {
+      const s = document.createElement("span");
+      s.textContent = baseEmoji + tone;
+      s.addEventListener("click", (e) => { e.stopPropagation(); closeSkinPopup(); copyEmoji(baseEmoji + tone, e); });
+      popup.appendChild(s);
+    });
+    cell.appendChild(popup);
+    activeSkinPopup = popup;
+    const close = (e) => { if (!popup.contains(e.target)) { closeSkinPopup(); document.removeEventListener("click", close); } };
+    setTimeout(() => document.addEventListener("click", close), 10);
+  }
+}
+
+document.getElementById("skinOverlay").addEventListener("click", closeSkinPopup);
+
+// Grid
+const grid = document.getElementById("emojiGrid");
+const countEl = document.getElementById("emojiCount");
+const noResultsEl = document.getElementById("noResults");
+
+function renderGrid() {
+  const query = document.getElementById("search").value.trim().toLowerCase();
+  let filtered;
+  if (query) {
+    filtered = EMOJIS.filter(e =>
+      e.name.toLowerCase().includes(query) ||
+      e.keywords.some(k => k.toLowerCase().includes(query))
+    );
+  } else {
+    filtered = EMOJIS.filter(e => e.category === currentCategory);
+  }
+
+  grid.innerHTML = "";
+  if (filtered.length === 0) {
+    noResultsEl.style.display = "block";
+    noResultsEl.textContent = query ? "No emojis found for '" + query + "'" : "No emojis in this category";
+    countEl.textContent = "";
+  } else {
+    noResultsEl.style.display = "none";
+    filtered.forEach(e => {
+      const cell = document.createElement("div");
+      cell.className = "emoji-cell";
+      cell.textContent = e.emoji;
+      cell.title = e.name;
+      let longPressTimer;
+      cell.addEventListener("click", (ev) => { copyEmoji(e.emoji, ev); });
+      if (SKIN_CAPABLE.has(e.emoji)) {
+        if (isMobile) {
+          cell.addEventListener("touchstart", () => { longPressTimer = setTimeout(() => showSkinTones(e.emoji, cell), 500); }, {passive:true});
+          cell.addEventListener("touchend", () => clearTimeout(longPressTimer), {passive:true});
+          cell.addEventListener("touchmove", () => clearTimeout(longPressTimer), {passive:true});
+        } else {
+          cell.addEventListener("contextmenu", (ev) => { ev.preventDefault(); showSkinTones(e.emoji, cell, ev); });
+          let hoverTimer;
+          cell.addEventListener("mouseenter", () => { hoverTimer = setTimeout(() => showSkinTones(e.emoji, cell), 600); });
+          cell.addEventListener("mouseleave", () => clearTimeout(hoverTimer));
+        }
+      }
+      grid.appendChild(cell);
+    });
+    countEl.textContent = "Showing " + filtered.length + " emojis";
+  }
+  document.getElementById("statusLeft").textContent = EMOJIS.length + " emojis · Click to copy";
+}
+
+// Search
+document.getElementById("search").addEventListener("input", renderGrid);
+
+// Multi-select
+const multiToggle = document.getElementById("multiToggle");
+multiToggle.addEventListener("click", () => {
+  multiMode = !multiMode;
+  multiToggle.classList.toggle("active", multiMode);
+  multiToggle.textContent = multiMode ? "Single Select" : "Select Multiple";
+  document.getElementById("multiBar").classList.toggle("active", multiMode);
+  if (!multiMode) { multiEmojis = ""; document.getElementById("multiField").textContent = ""; }
+});
+document.getElementById("copyAll").addEventListener("click", async () => {
+  if (multiEmojis) {
+    try { await navigator.clipboard.writeText(multiEmojis); } catch {}
+    showToast(null, "Copied!");
+    addToRecent(multiEmojis);
+  }
+});
+document.getElementById("clearMulti").addEventListener("click", () => {
+  multiEmojis = "";
+  document.getElementById("multiField").textContent = "";
+});
+
+// Service Worker
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+
+// Init
+renderRecent();
+renderGrid();
+</script></body></html>
