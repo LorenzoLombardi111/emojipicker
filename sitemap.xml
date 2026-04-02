@@ -3,7 +3,13 @@
   <url>
     <loc>https://freeemojipicker.app/</loc>
     <lastmod>2026-04-02</lastmod>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://freeemojipicker.app/llms.txt</loc>
+    <lastmod>2026-04-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
   </url>
 </urlset>

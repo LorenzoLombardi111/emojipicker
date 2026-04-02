@@ -3,14 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Free Emoji Picker — Search, Click, Copy | freeemojipicker.app</title>
-<meta name="description" content="Copy emojis free. Search, click, paste. 500+ emojis with skin tone support.">
-<meta property="og:title" content="freeemojipicker.app — Copy Emojis Free">
-<meta property="og:description" content="Search, Click, Paste — 500+ emojis with skin tone support">
+<title>Free Emoji Picker — Search & Copy Emojis | freeemojipicker.app</title>
+<meta name="description" content="Free emoji picker with 900+ emojis. Search by name, click to copy, paste anywhere. Skin tones, multi-select, no install needed.">
+<link rel="canonical" href="https://freeemojipicker.app/">
+<meta property="og:title" content="Free Emoji Picker — Search & Copy Emojis | freeemojipicker.app">
+<meta property="og:description" content="Free emoji picker with 900+ emojis. Search by name, click to copy, paste anywhere. Skin tones, multi-select, no install needed.">
 <meta property="og:image" content="https://freeemojipicker.app/og-image.svg">
-<meta property="og:url" content="https://freeemojipicker.app">
+<meta property="og:url" content="https://freeemojipicker.app/">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="freeemojipicker.app">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Free Emoji Picker — Search & Copy Emojis | freeemojipicker.app">
+<meta name="twitter:description" content="Free emoji picker with 900+ emojis. Search by name, click to copy, paste anywhere. Skin tones, multi-select, no install needed.">
+<meta name="twitter:image" content="https://freeemojipicker.app/og-image.svg">
+<script type="application/ld+json">
+[{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "freeemojipicker.app",
+  "url": "https://freeemojipicker.app/",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Any",
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+  "description": "Free emoji picker with 900+ emojis. Search by name, click to copy, paste anywhere. Skin tones, multi-select, dark mode."
+},{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "Is freeemojipicker.app free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, freeemojipicker.app is completely free to use with no sign-up, no ads, and no limits. All processing happens in your browser."}},
+    {"@type": "Question", "name": "How do I copy an emoji?", "acceptedAnswer": {"@type": "Answer", "text": "Simply click any emoji in the grid and it is instantly copied to your clipboard. You will see a 'Copied!' confirmation. Then paste it anywhere with Ctrl+V or Cmd+V."}},
+    {"@type": "Question", "name": "Can I copy multiple emojis at once?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Click 'Select Multiple' to enter multi-select mode. Click emojis to build a string, then press 'Copy All' to copy the entire sequence at once."}},
+    {"@type": "Question", "name": "Do the emojis work everywhere?", "acceptedAnswer": {"@type": "Answer", "text": "Emojis are Unicode characters supported by virtually every modern platform including iMessage, WhatsApp, Slack, Instagram, Twitter, Facebook, email clients, and more."}},
+    {"@type": "Question", "name": "Are skin tone variants available?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Hover over any hand or people emoji to see a skin tone selector with 6 options: default yellow plus 5 skin tone modifiers. On mobile, long-press to open the skin tone picker."}},
+    {"@type": "Question", "name": "Does it work on mobile?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. freeemojipicker.app is fully responsive. Tap to copy, long-press for skin tones, and swipe through categories. No app install required."}}
+  ]
+},{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://freeemojipicker.app/"}]
+}]
+</script>
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,7 +51,8 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#faf9f6;--surface:#f4f2ee;--border:#e8e4dd;--text:#1a1917;--muted:#8a8780;--accent:#C49A2A;--font-ui:'DM Sans',sans-serif;--font-content:'Lora',serif}
 [data-theme="dark"]{--bg:#141412;--surface:#1e1c1a;--border:#2e2b27;--text:#f0ede8;--muted:#8a8780;--accent:#D4A835}
-body{font-family:var(--font-ui);background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;transition:background .15s ease,color .15s ease}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;transition:background .15s ease,color .15s ease}
+.app-shell{height:100vh;display:flex;flex-direction:column;overflow:hidden}
 header{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--border);flex-shrink:0}
 .logo{font-size:15px;font-weight:600;color:var(--accent);text-decoration:none}
 .theme-toggle{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:14px;color:var(--text);transition:.15s ease}
@@ -77,9 +110,25 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 @media(min-width:601px) and (max-width:900px){
   .emoji-grid{grid-template-columns:repeat(6,1fr)}
 }
+.seo-content{max-width:720px;margin:0 auto;padding:48px 16px 32px}
+.seo-content h1{font-family:var(--font-content);font-size:28px;font-weight:600;margin-bottom:32px;line-height:1.3}
+.seo-content h2{font-family:var(--font-content);font-size:20px;font-weight:600;margin:32px 0 12px;line-height:1.4}
+.seo-content p{font-family:var(--font-ui);font-size:15px;line-height:1.7;color:var(--text);margin-bottom:16px}
+.seo-content .faq{margin-top:40px}
+.seo-content .faq h2{margin-bottom:16px}
+.seo-content details{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;transition:.15s ease}
+.seo-content details[open]{background:var(--surface)}
+.seo-content summary{padding:12px 16px;cursor:pointer;font-family:var(--font-ui);font-size:15px;font-weight:500;list-style:none}
+.seo-content summary::-webkit-details-marker{display:none}
+.seo-content summary::before{content:"▸ ";color:var(--accent)}
+.seo-content details[open] summary::before{content:"▾ "}
+.seo-content details p{padding:0 16px 12px;margin:0;color:var(--muted);font-size:14px;line-height:1.7}
+.seo-footer{max-width:720px;margin:0 auto;padding:24px 16px 48px;text-align:center;font-size:13px;color:var(--muted);border-top:1px solid var(--border)}
+.seo-footer .more-tools-placeholder{margin-top:12px}
 </style>
 </head>
 <body>
+<div class="app-shell">
 <header>
   <a class="logo" href="/">freeemojipicker.app</a>
   <button class="theme-toggle" id="themeBtn" aria-label="Toggle dark mode">🌙</button>
@@ -98,6 +147,66 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 <div class="skin-sheet" id="skinSheet"><div class="skin-sheet-title">Choose skin tone</div><div class="skin-sheet-options" id="skinSheetOptions"></div></div>
 <a class="badge" href="https://freesuite.app" target="_blank" rel="noopener">by freesuite.app</a>
 <footer class="status-bar"><span id="statusLeft"></span><span>All processing in your browser</span></footer>
+</div><!-- .app-shell -->
+
+<div class="seo-content">
+  <h1>Free Emoji Picker — Search, Click, Copy & Paste</h1>
+
+  <h2>How do I copy and paste emojis?</h2>
+  <p>Copying emojis with freeemojipicker.app is as simple as a single click. Browse the grid or use the search bar to find the emoji you need, then click it — the emoji is instantly copied to your clipboard. Paste it into any app, website, or document using Ctrl+V (Windows/Linux) or Cmd+V (Mac). There is no software to install, no extension to add, and no account to create. Your recently copied emojis are saved automatically so you can quickly reuse favorites. On mobile devices, simply tap an emoji to copy and long-press to access skin tone variants. The entire experience is designed to get you from search to paste in under two seconds.</p>
+
+  <h2>What emoji categories does freeemojipicker.app include?</h2>
+  <p>freeemojipicker.app includes over 900 emojis organized into nine categories: Smileys & Emotion for faces and expressions, People & Body for hand gestures and characters, Animals & Nature for creatures and plants, Food & Drink for meals and beverages, Activities for sports and hobbies, Travel & Places for vehicles, buildings, and weather, Objects for everyday items and technology, Symbols for hearts, arrows, and signs, and Flags for over 50 country flags. Each category is accessible through a horizontal tab bar, and all emojis are searchable by name and keyword regardless of category.</p>
+
+  <h2>Can I search for emojis by name?</h2>
+  <p>Yes. The search bar at the top of the page lets you filter emojis instantly as you type. Search works across emoji names and keywords — type "happy" to find grinning faces, "heart" for all heart variations, or "dog" for canine emojis. Search results span all categories simultaneously, so you never need to guess which tab an emoji belongs to. If no emojis match your query, a clear message tells you so. Clearing the search bar returns you to browsing the currently selected category. The search is instantaneous with no delay, making it the fastest way to find exactly the emoji you need.</p>
+
+  <h2>Does freeemojipicker.app support skin tone variations?</h2>
+  <p>Yes. Any emoji depicting a hand gesture or person supports skin tone modifiers. On desktop, hover over a supported emoji for a moment to reveal a popup with six options: the default yellow tone plus five skin tone variations matching the Unicode standard. Click any variant to copy it directly. On mobile devices, long-press a supported emoji to open a bottom sheet with the same six skin tone options. Skin tone emojis are standard Unicode characters, so they display correctly on every modern platform including iOS, Android, Windows, macOS, and all major social media and messaging apps.</p>
+
+  <h2>Why use freeemojipicker.app instead of your phone's emoji keyboard?</h2>
+  <p>While phone keyboards include emojis, freeemojipicker.app offers advantages that native keyboards lack. The search bar lets you find emojis by descriptive keywords rather than scrolling through pages. Multi-select mode lets you build a string of multiple emojis and copy them all at once — perfect for crafting reactions or social media posts. Your recently copied emojis persist across sessions for quick access to favorites. The responsive grid displays far more emojis at a glance than a phone keyboard, especially on desktop screens. Everything runs in your browser with no data sent to any server, and it works identically on every device and operating system.</p>
+
+  <div class="faq">
+    <h2>Frequently Asked Questions</h2>
+
+    <details>
+      <summary>Is freeemojipicker.app free?</summary>
+      <p>Yes, freeemojipicker.app is completely free to use with no sign-up, no ads, and no limits. All processing happens in your browser.</p>
+    </details>
+
+    <details>
+      <summary>How do I copy an emoji?</summary>
+      <p>Simply click any emoji in the grid and it is instantly copied to your clipboard. You will see a "Copied!" confirmation. Then paste it anywhere with Ctrl+V or Cmd+V.</p>
+    </details>
+
+    <details>
+      <summary>Can I copy multiple emojis at once?</summary>
+      <p>Yes. Click "Select Multiple" to enter multi-select mode. Click emojis to build a string, then press "Copy All" to copy the entire sequence at once.</p>
+    </details>
+
+    <details>
+      <summary>Do the emojis work everywhere?</summary>
+      <p>Emojis are Unicode characters supported by virtually every modern platform including iMessage, WhatsApp, Slack, Instagram, Twitter, Facebook, email clients, and more.</p>
+    </details>
+
+    <details>
+      <summary>Are skin tone variants available?</summary>
+      <p>Yes. Hover over any hand or people emoji to see a skin tone selector with 6 options: default yellow plus 5 skin tone modifiers. On mobile, long-press to open the skin tone picker.</p>
+    </details>
+
+    <details>
+      <summary>Does it work on mobile?</summary>
+      <p>Yes. freeemojipicker.app is fully responsive. Tap to copy, long-press for skin tones, and swipe through categories. No app install required.</p>
+    </details>
+  </div>
+</div>
+
+<div class="seo-footer">
+  <p>&copy; freeemojipicker.app</p>
+  <div class="more-tools-placeholder"></div>
+</div>
+
 <script>
 const SKIN_TONES = ['', '\u{1F3FB}', '\u{1F3FC}', '\u{1F3FD}', '\u{1F3FE}', '\u{1F3FF}'];
 const SKIN_CAPABLE = new Set();

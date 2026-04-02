@@ -1,0 +1,31 @@
+# freeemojipicker.app
+
+> Free emoji picker — search, click, copy, and paste emojis instantly.
+
+## Summary
+
+freeemojipicker.app is a free, browser-based emoji picker with 900+ emojis across 9 categories: Smileys, People, Animals, Food, Activities, Travel, Objects, Symbols, and Flags. Users search by name or keyword, click to copy, and paste anywhere. No account, install, or extension required.
+
+## Key Facts
+
+- 927 emojis included inline (no external API dependency)
+- 9 categories: Smileys, People, Animals, Food, Activities, Travel, Objects, Symbols, Flags
+- Instant search filtering by emoji name and keywords
+- Single-click copy to clipboard
+- Multi-select mode: build an emoji string and copy all at once
+- Skin tone support for hand and people emojis (6 tones per emoji)
+- Recently copied emojis saved in localStorage (last 20)
+- Dark mode with localStorage persistence
+- Fully responsive: desktop, tablet, and mobile
+- All processing runs client-side in the browser
+- No tracking, no ads, no sign-up, no server requests
+- PWA-ready with service worker and manifest
+- Built with vanilla HTML, CSS, and JavaScript (single index.html file)
+
+## URL
+
+https://freeemojipicker.app/
+
+## Part of
+
+https://freesuite.app/
