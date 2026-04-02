@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#C49A2A">
 <title>Free Emoji Picker — Search & Copy Emojis | freeemojipicker.app</title>
 <meta name="description" content="Free emoji picker with 900+ emojis. Search by name, click to copy, paste anywhere. Skin tones, multi-select, no install needed.">
 <link rel="canonical" href="https://freeemojipicker.app/">
@@ -30,8 +31,8 @@
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": [
-    {"@type": "Question", "name": "Is freeemojipicker.app free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, freeemojipicker.app is completely free to use with no sign-up, no ads, and no limits. All processing happens in your browser."}},
-    {"@type": "Question", "name": "How do I copy an emoji?", "acceptedAnswer": {"@type": "Answer", "text": "Simply click any emoji in the grid and it is instantly copied to your clipboard. You will see a 'Copied!' confirmation. Then paste it anywhere with Ctrl+V or Cmd+V."}},
+    {"@type": "Question", "name": "Is freeemojipicker.app free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, freeemojipicker.app is completely free to use with no sign-up, no ads, and no limits. All emoji processing happens entirely in your browser."}},
+    {"@type": "Question", "name": "How do I copy an emoji?", "acceptedAnswer": {"@type": "Answer", "text": "Simply click any emoji in the grid and it is instantly copied to your clipboard. You will see a Copied confirmation. Then paste it anywhere with Ctrl+V or Cmd+V."}},
     {"@type": "Question", "name": "Can I copy multiple emojis at once?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Click 'Select Multiple' to enter multi-select mode. Click emojis to build a string, then press 'Copy All' to copy the entire sequence at once."}},
     {"@type": "Question", "name": "Do the emojis work everywhere?", "acceptedAnswer": {"@type": "Answer", "text": "Emojis are Unicode characters supported by virtually every modern platform including iMessage, WhatsApp, Slack, Instagram, Twitter, Facebook, email clients, and more."}},
     {"@type": "Question", "name": "Are skin tone variants available?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Hover over any hand or people emoji to see a skin tone selector with 6 options: default yellow plus 5 skin tone modifiers. On mobile, long-press to open the skin tone picker."}},
@@ -66,24 +67,24 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 .multi-bar{width:100%;max-width:600px;display:none;align-items:center;gap:8px;margin-bottom:12px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px}
 .multi-bar.active{display:flex}
 .multi-field{flex:1;font-size:20px;min-height:32px;line-height:32px;overflow-x:auto;white-space:nowrap}
-.multi-bar button{font-family:var(--font-ui);font-size:12px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:.15s ease;white-space:nowrap}
+.multi-bar button{font-family:var(--font-ui);font-size:12px;padding:12px 16px;border-radius:8px;min-height:44px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:.15s ease;white-space:nowrap}
 .multi-bar button.copy-all{background:var(--accent);color:#fff;border-color:var(--accent)}
 .toolbar{width:100%;max-width:600px;display:flex;align-items:center;gap:8px;margin-bottom:12px}
-.toolbar .btn{font-family:var(--font-ui);font-size:12px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:.15s ease}
+.toolbar .btn{font-family:var(--font-ui);font-size:12px;padding:12px 16px;border-radius:8px;min-height:44px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:.15s ease}
 .toolbar .btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 .recent-bar{width:100%;max-width:600px;margin-bottom:12px;display:none}
 .recent-bar.visible{display:block}
 .recent-label{font-size:12px;color:var(--muted);margin-bottom:4px}
 .recent-emojis{display:flex;gap:4px;flex-wrap:wrap}
-.recent-emojis span{font-size:22px;cursor:pointer;padding:4px;border-radius:6px;transition:.15s ease}
+.recent-emojis span{font-size:22px;cursor:pointer;padding:8px;border-radius:6px;transition:.15s ease;min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
 .recent-emojis span:hover{background:var(--surface);transform:scale(1.15)}
 .cat-tabs{display:flex;gap:8px;overflow-x:auto;width:100%;max-width:600px;margin-bottom:12px;padding-bottom:4px;scrollbar-width:none;-ms-overflow-style:none}
 .cat-tabs::-webkit-scrollbar{display:none}
-.cat-tab{display:flex;align-items:center;gap:4px;padding:8px 12px;border-radius:6px;background:var(--surface);border:1px solid var(--border);cursor:pointer;white-space:nowrap;font-size:12px;font-family:var(--font-ui);color:var(--text);transition:.15s ease;flex-shrink:0}
+.cat-tab{display:flex;align-items:center;gap:4px;padding:10px 12px;border-radius:6px;min-height:44px;background:var(--surface);border:1px solid var(--border);cursor:pointer;white-space:nowrap;font-size:12px;font-family:var(--font-ui);color:var(--text);transition:.15s ease;flex-shrink:0}
 .cat-tab:hover{border-color:var(--accent)}
 .cat-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.emoji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:4px;width:100%;max-width:600px;padding-bottom:12px}
-.emoji-cell{width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;border-radius:6px;transition:.15s ease;position:relative;user-select:none;-webkit-user-select:none}
+.emoji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:4px;width:100%;max-width:600px;padding-bottom:12px}
+.emoji-cell{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;border-radius:6px;transition:.15s ease;position:relative;user-select:none;-webkit-user-select:none}
 .emoji-cell:hover{background:var(--surface);transform:scale(1.15)}
 .emoji-count{font-size:12px;color:var(--muted);text-align:center;padding:8px 0;width:100%;max-width:600px}
 .no-results{text-align:center;color:var(--muted);padding:32px 0;font-family:var(--font-content);width:100%;max-width:600px}
